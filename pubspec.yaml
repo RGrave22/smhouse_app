@@ -39,6 +39,18 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  dob_input_field: ^2.0.0
+  crypto: ^3.0.1
+  sqflite: # SQLite features
+  path: # Features for file locations
+  http:
+  cookie_jar: ^4.0.8
+  permission_handler:
+  build_runner:
+  build_web_compilers:
+  localstorage: ^5.0.0
+  flutter_colorpicker:
+  fl_chart:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
