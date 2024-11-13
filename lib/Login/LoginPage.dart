@@ -16,17 +16,25 @@ class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController passwordController;
 
 
+  @override
+  void initState() {
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-          child:  Column(
+          child:  const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Welcome', style: TextStyle(
-                fontFamily: 'Montserrat'
+                'SmHouse', style: TextStyle(
+                fontFamily: 'SmHouse', fontSize: 40,
               ),
               ),
               // Additional content can be added below the title if needed
@@ -56,10 +64,10 @@ class _LoginScreenState extends State<LoginScreen> {
             cursorColor: const Color.fromRGBO(82, 130, 103, 1.0), // Set the cursor color here
             obscureText: true,
             controller: passwordController,
-            decoration:  InputDecoration(
-              border: const UnderlineInputBorder(),
+            decoration:  const InputDecoration(
+              border: UnderlineInputBorder(),
               labelText: 'Password',
-              focusedBorder: const UnderlineInputBorder(
+              focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
                   color: Color.fromRGBO(82, 130, 103, 1.0),
                 ),
@@ -72,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
          //   _showResetPasswordDialog(context);
           },
           style: ButtonStyle(
-            foregroundColor: WidgetStateProperty.all<Color>(const Color.fromRGBO(121, 135, 119, 1)),
+            foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
           ),
           child:  Text('Forgot Password?',
           ),
@@ -84,13 +92,13 @@ class _LoginScreenState extends State<LoginScreen> {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
-                backgroundColor: const Color.fromRGBO(82, 130, 103, 1.0),
+                backgroundColor: const Color(0xFF63AFC0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
                 ),
               ),
               onPressed: () {  },
-              child: Text('Log In',
+              child: const Text('Log In', style: TextStyle(color: Colors.white),
               ),
          //     onPressed: () => logInButtonPressed(
          //         emailController.text, passwordController.text),
