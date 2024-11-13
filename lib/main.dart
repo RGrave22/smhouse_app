@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         home: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor:  Colors.white,
             body: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
                         alignment: Alignment.center,
                         width: 350.0,
                         height: 550.0,
-                        child: const LoginScreen(),
+                        child: LoginScreen(),
                       ),
                     ),
                   ],
