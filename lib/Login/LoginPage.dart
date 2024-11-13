@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(username: username), // Pass the username to MainPage
+          builder: (context) => MainScreen(username: username),
         ),
       );
     } else {

@@ -9,7 +9,7 @@ class User {
     required this.email,
   });
 
-  // Convert a User object to a map (for inserting into the database)
+
   Map<String, dynamic> toMap() {
     return {
       'username': username,
@@ -18,7 +18,7 @@ class User {
     };
   }
 
-  // Create a User object from a map (for retrieving from the database)
+
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       username: map['username'],
@@ -27,7 +27,7 @@ class User {
     );
   }
 
-  // Optionally, you can override `toString` to make it more readable when printing
+
   @override
   String toString() {
     return 'User(username: $username, password: $password, email: $email)';
