@@ -45,10 +45,12 @@ class LocalDB {
     User user1 = User(username: 'user1', password: 'password1', email: 'user1@example.com');
     User user2 = User(username: 'user2', password: 'password2', email: 'user2@example.com');
     User user3 = User(username: 'user3', password: 'password3', email: 'user3@example.com');
+    User user4 = User(username: '1', password: '1', email: '1');
 
     await db.insert('users', user1.toMap());
     await db.insert('users', user2.toMap());
     await db.insert('users', user3.toMap());
+    await db.insert('users', user4.toMap());
 
     print('Default users inserted.');
   }
