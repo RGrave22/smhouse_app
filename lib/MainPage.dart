@@ -11,8 +11,65 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // Método para exibir o popup customizado
-void _showAddRoomDialog() {
+  // Lista para armazenar as divisões criadas, com algumas salas padrão
+  List<String> rooms = ['Living Room', 'Bedroom', 'Kitchen'];
+
+  // Método para exibir o popup de seleção de tipo de sala
+  void _showAddRoomDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header com texto centralizado e botão de fechar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Texto "Add Room"
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'Add Room',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Botão de fechar
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.teal),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Fecha o popup
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // Lista de divisões
+                _buildRoomOption(Icons.kitchen, "Kitchen"),
+                _buildRoomOption(Icons.bed, "BedRoom"),
+                _buildRoomOption(Icons.garage, "Garage"),
+                _buildRoomOption(Icons.computer, "Office"),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditRoomDialog(String roomType) {
+  TextEditingController _roomNameController = TextEditingController();
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -25,41 +82,63 @@ void _showAddRoomDialog() {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header com texto centralizado e botão de fechar
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Texto "Add Room"
-                   const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        'Add Room',
-                        style: TextStyle(
+                        'Edit Room - $roomType',
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  // Botão de fechar
                   IconButton(
-                    icon: Icon(Icons.close, color: Colors.teal),
+                    icon: const Icon(Icons.close, color: Colors.teal),
                     onPressed: () {
-                      Navigator.of(context).pop(); // Fecha o popup
+                      Navigator.of(context).pop();
                     },
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-              // Lista de divisões
-              _buildRoomOption(Icons.kitchen, "Kitchen"),
-              _buildRoomOption(Icons.bed, "BedRoom"),
-              _buildRoomOption(Icons.garage, "Garage"),
-              _buildRoomOption(Icons.computer, "Office"),
-                            _buildRoomOption(Icons.kitchen, "Kitchen"),
-              _buildRoomOption(Icons.bed, "BedRoom"),
-              _buildRoomOption(Icons.garage, "Garage"),
-              _buildRoomOption(Icons.computer, "Office"),
+              TextField(
+                controller: _roomNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Room Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Verifica se o campo está vazio e atribui um nome padrão
+                  String roomName = _roomNameController.text.isEmpty
+                      ? 'Room ${rooms.length + 1}'
+                      : _roomNameController.text;
+                  
+                  Navigator.of(context).pop();
+                  setState(() {
+                    rooms.add(roomName);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Room "$roomName" created!')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                ),
+                child: const Text(
+                  'Create',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
             ],
           ),
         ),
@@ -68,19 +147,13 @@ void _showAddRoomDialog() {
   );
 }
 
-
-
-  // Método para criar cada opção de divisão
   Widget _buildRoomOption(IconData icon, String label) {
     return ListTile(
       leading: Icon(icon, color: Colors.teal),
-      title: Text(label, style: TextStyle(color: Colors.teal)),
+      title: Text(label, style: const TextStyle(color: Colors.teal)),
       onTap: () {
-        // Lógica para seleção da divisão
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$label added!')),
-        );
+        Navigator.of(context).pop(); 
+        _showEditRoomDialog(label); 
       },
     );
   }
@@ -92,13 +165,13 @@ void _showAddRoomDialog() {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.teal),
+          icon: const Icon(Icons.menu, color: Colors.teal),
           iconSize: 45,
           onPressed: () {},
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.account_circle, color: Colors.teal),
+            icon: const Icon(Icons.account_circle, color: Colors.teal),
             iconSize: 45,
             onPressed: () {},
           ),
@@ -112,7 +185,7 @@ void _showAddRoomDialog() {
             Center(
               child: Image.asset('assets/Logo_init.jpeg', height: 80),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Card(
               elevation: 2,
               child: Padding(
@@ -126,40 +199,35 @@ void _showAddRoomDialog() {
                 ),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Your House:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Expanded(
               child: ListView(
-                children: [
-                  _buildRoomCard('Living Room', '20 Devices On'),
-                  _buildRoomCard('Bedroom', '10 Devices On'),
-                  _buildRoomCard('Kitchen', '5 Devices On'),
-                                    _buildRoomCard('Living Room', '20 Devices On'),
-                  _buildRoomCard('Bedroom', '10 Devices On'),
-                  _buildRoomCard('Kitchen', '5 Devices On'),
-                ],
+                children: rooms
+                    .map((room) => _buildRoomCard(room, 'Devices On')) 
+                    .toList(),
               ),
             ),
-            SizedBox(height: 7),
+            const SizedBox(height: 7),
             Center(
               child: ElevatedButton(
-                onPressed: _showAddRoomDialog, // Chama o método para exibir o popup
+                onPressed: _showAddRoomDialog, 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(20),
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(20),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.add,
                   color: Colors.white,
                   size: 30,
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -174,17 +242,17 @@ void _showAddRoomDialog() {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               value,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             Icon(icon, color: Colors.teal, size: 24),
           ],
         ),
@@ -196,12 +264,12 @@ void _showAddRoomDialog() {
     return Card(
       elevation: 2,
       child: ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           backgroundImage: AssetImage('assets/Logo_init.jpeg'),
         ),
         title: Text(roomName),
         subtitle: Text(devicesOn),
-        trailing: Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right),
       ),
     );
   }
