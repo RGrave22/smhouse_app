@@ -1,16 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MainScreen extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final String username;
 
-  const MainScreen({super.key, required this.username});
+  const HomePage({super.key, required this.username});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _HomePageState extends State<HomePage> {
   // Lista para armazenar as divisões criadas, com algumas salas padrão
   List<String> rooms = ['Living Room', 'Bedroom', 'Kitchen'];
 
@@ -161,22 +160,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.teal),
-          iconSize: 45,
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle, color: Colors.teal),
-            iconSize: 45,
-            onPressed: () {},
-          ),
-        ],
-      ),
+     
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

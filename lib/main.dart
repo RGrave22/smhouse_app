@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smhouse_app/HomePage.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'Login/LoginPage.dart';
 
@@ -9,7 +11,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,7 +57,293 @@ class MyApp extends StatelessWidget {
             )
         ));
   }
+
 }
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  late TabController _tabController;
+
+  int currentIndex = 0;
+
+  void navigateToPage(int index) {
+    setState(() { 
+      currentIndex = index;
+      _tabController.animateTo(index);
+    });
+  }
+
+ @override
+  void initState() {
+  super.initState();
+    _tabController = TabController(length: screens.length, vsync: this);
+  }
+
+  final screens = [
+    const HomePage(username: ""), //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE 
+  ];
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        leading: IconButton(
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+          icon: const Icon(Icons.menu, color: Colors.teal),
+          iconSize: 50,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                navigateToPage(9); //mudar para o numero da pagina do userPage
+              });
+            },
+            icon: const Icon(Icons.account_circle, color: Colors.teal),
+            iconSize: 50,
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 255, 255, 255),
+              ),
+              child: Center(
+                child: FractionallySizedBox(
+                  widthFactor: 0.9, 
+                  heightFactor: 0.9, 
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        'assets/Logo_init.jpeg',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.house),
+              title: const Text('Menu Principal'),
+              onTap: () {
+                navigateToPage(0);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.map),
+              title: const Text('Mapa'),
+              onTap: () {
+                navigateToPage(2);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.userGroup),
+              title: const Text('Grupos'),
+              onTap: () {
+                navigateToPage(3);
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.chalkboardUser),
+              title: const Text('Tutores'),
+              onTap: () {
+                navigateToPage(4);
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.newspaper),
+              title: const Text('Noticias'),
+              onTap: () {
+                navigateToPage(5);
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.searchengin),
+              title: const Text('Perdidos e Achados'),
+              onTap: () {
+                navigateToPage(1);
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.utensils),
+              title: const Text('Refeitorio'),
+              onTap: () {
+                navigateToPage(6);
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.circleInfo),
+              title: const Text('Sobre Nós'),
+              onTap: () {
+                navigateToPage(7);
+                Navigator.pop(context);
+              },
+            ),
+
+            ListTile(
+              leading: const FaIcon(FontAwesomeIcons.gear),
+              title: const Text('Definições'),
+              onTap: () {
+                navigateToPage(8);
+                Navigator.pop(context);
+              },
+            ),
+
+      
+
+          ],
+        ),
+      ),
+      body: screens[
+          currentIndex], 
+
+      bottomNavigationBar: Container(
+        height: 42,
+        color: const Color.fromARGB(255, 2, 58, 103),
+        child: TabBar(
+          controller: _tabController,
+          onTap: (index) => setState(() => currentIndex = index),
+          isScrollable: true,
+          tabs: const [
+            SizedBox(
+              width: 50,
+              child: Tab(
+                icon: Icon(
+                  FontAwesomeIcons.house,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: Icon(
+          //         FontAwesomeIcons.searchengin,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: Icon(
+          //         FontAwesomeIcons.map,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         FontAwesomeIcons.userGroup,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         FontAwesomeIcons.chalkboardUser,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         FontAwesomeIcons.newspaper,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         FontAwesomeIcons.utensils,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         FontAwesomeIcons.circleInfo,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         FontAwesomeIcons.gear,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     width: 50,
+          //     child: Tab(
+          //       icon: FaIcon(
+          //         Icons.person,
+          //         size: 38,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+           ],
+        ),
+      ),
+    );
+  }
+}
+
 
 
 

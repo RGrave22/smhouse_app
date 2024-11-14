@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smhouse_app/MainPage.dart';
+import 'package:smhouse_app/HomePage.dart';
 import 'package:smhouse_app/Register/RegisterPage.dart';
+import 'package:smhouse_app/main.dart';
 
 import '../DB/DB.dart';
 
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(username: username),
+          builder: (context) => MainPage(),
         ),
       );
     } else {
