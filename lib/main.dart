@@ -87,6 +87,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     _tabController = TabController(length: screens.length, vsync: this);
   }
 
+
+  /**
+   * ADICIONAR PAGINA NO ARRAY dos SCREENS E VERIFICAR O NUMERO PARA QUANDO CARREGAR LA IR PARA A PAGINA
+   */
   final screens = [
     const HomePage(username: ""), //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE 
   ];
