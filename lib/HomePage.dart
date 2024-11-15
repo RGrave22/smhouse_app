@@ -1,17 +1,65 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  final String username;
+import 'DB/DB.dart';
+import 'Data/Division.dart';
+import 'Data/User.dart';
 
-  const HomePage({super.key, required this.username});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  // Lista para armazenar as divisões criadas, com algumas salas padrão
-  List<String> rooms = ['Living Room', 'Bedroom', 'Kitchen'];
+  final LocalDB db = LocalDB('SmHouse');
+  late User user;
+  List<Division> rooms = [];
+  bool isLoading = true;
+
+
+  @override
+  void initState() {
+    getInfo();
+    super.initState();
+  }
+
+  Future<void> getInfo() async {
+    setState(() {
+      isLoading = true;
+    });
+    user = await db.getLoginUser();
+
+    rooms = await db.getDivisions(user.casa);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  String getHouseTemp(){
+    int temp = 0;
+    int nDivs = 0;
+    for(Division d in rooms){
+      temp = temp + int.parse(d.divTemp);
+      nDivs++;
+    }
+
+    double res = temp/nDivs;
+    return "${res.toStringAsFixed(0)}º";
+  }
+
+  String getDivName(String divName){
+    return divName.split(":")[2];
+  }
+
+  void addRoom(String roomName){
+    String divName = "${user.casa}:$roomName";
+    Division div = Division(divName: divName, houseName: user.casa, divON: 0, divTemp: getHouseTemp().replaceAll("º", ""));
+    rooms.add(div);
+    db.addDivision(div);
+    print(rooms);
+  }
 
   // Método para exibir o popup de seleção de tipo de sala
   void _showAddRoomDialog() {
@@ -121,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                   
                   Navigator.of(context).pop();
                   setState(() {
-                    rooms.add(roomName);
+                    addRoom(roomName);
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Room "$roomName" created!')),
@@ -160,8 +208,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
-      body: Padding(
+      body:
+      isLoading
+          ? const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+        ),
+      )
+        : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildWeatherInfo("Weather", "22°"),
-                    _buildWeatherInfo("Temp House", "22°"),
+                    _buildWeatherInfo("Temp House", getHouseTemp()),
                   ],
                 ),
               ),
@@ -191,7 +245,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: ListView(
                 children: rooms
-                    .map((room) => _buildRoomCard(room, 'Devices On')) 
+                    .map((room) => _buildRoomCard(getDivName(room.divName), 'Devices On'))
                     .toList(),
               ),
             ),

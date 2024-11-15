@@ -60,6 +60,7 @@ class MyApp extends StatelessWidget {
 
 }
 class MainPage extends StatefulWidget {
+
   const MainPage({super.key});
 
   @override
@@ -72,6 +73,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   late TabController _tabController;
 
+  late String username = "";
+
   int currentIndex = 0;
 
   void navigateToPage(int index) {
@@ -83,16 +86,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
  @override
   void initState() {
-  super.initState();
-    _tabController = TabController(length: screens.length, vsync: this);
-  }
 
+    super.initState();
+      _tabController = TabController(length: screens.length, vsync: this);
+  }
 
   /**
    * ADICIONAR PAGINA NO ARRAY dos SCREENS E VERIFICAR O NUMERO PARA QUANDO CARREGAR LA IR PARA A PAGINA
    */
   final screens = [
-    const HomePage(username: ""), //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE 
+    const HomePage(), //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE
   ];
 
   @override

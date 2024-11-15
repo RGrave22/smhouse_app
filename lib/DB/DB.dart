@@ -2,6 +2,10 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
+import 'package:smhouse_app/Data/Casa.dart';
+import 'package:smhouse_app/Data/Device.dart';
+import 'package:smhouse_app/Data/Division.dart';
+import 'package:smhouse_app/Data/Light.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../Data/User.dart';
@@ -33,8 +37,14 @@ class LocalDB {
   Future<void> _onCreate(Database db, int version) async {
     print('onCreate');
     await db.transaction((txn) async {
-      await txn.execute('CREATE TABLE users (username TEXT PRIMARY KEY, password TEXT, email TEXT)');
-      await txn.execute('CREATE TABLE session (username TEXT PRIMARY KEY, password TEXT, email TEXT)');
+      await txn.execute('CREATE TABLE users (username TEXT PRIMARY KEY, password TEXT, email TEXT, casa TEXT)');
+      await txn.execute('CREATE TABLE session (username TEXT PRIMARY KEY, password TEXT, email TEXT, casa TEXT)');
+      await txn.execute('CREATE TABLE casa (houseName TEXT PRIMARY KEY, houseTemp TEXT, houseOn INTEGER)');
+      await txn.execute('CREATE TABLE division (divName TEXT PRIMARY KEY, houseName TEXT, divON INTEGER, divTemp)');
+      await txn.execute('CREATE TABLE device (devName TEXT PRIMARY KEY, isOn INTEGER, type TEXT)');
+      await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT)');
+      await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acTimer TEXT, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
+      await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarm INTEGER)');
     });
 
   }
@@ -42,15 +52,32 @@ class LocalDB {
   Future<void> insertDefaultUsers() async {
     final db = await initDB();
 
-    User user1 = User(username: 'user1', password: 'password1', email: 'user1@example.com');
-    User user2 = User(username: 'user2', password: 'password2', email: 'user2@example.com');
-    User user3 = User(username: 'user3', password: 'password3', email: 'user3@example.com');
-    User user4 = User(username: '1', password: '1', email: '1');
-
+    User user1 = User(username: 'user1', password: 'password1', email: 'user1@example.com', casa: 'user1:UsersHouse');
+    User user2 = User(username: 'user2', password: 'password2', email: 'user2@example.com', casa: 'user1:UsersHouse');
+    User user3 = User(username: 'user3', password: 'password3', email: 'user3@example.com', casa: 'user1:UsersHouse');
+    User user4 = User(username: '1', password: '1', email: '1', casa: 'user1:UsersHouse');
     await db.insert('users', user1.toMap());
     await db.insert('users', user2.toMap());
     await db.insert('users', user3.toMap());
     await db.insert('users', user4.toMap());
+
+    Casa usersHouse = Casa(houseName: 'user1:UsersHouse', houseTemp: "16", houseOn: 0);
+    await db.insert('casa', usersHouse.toMap());
+
+    Division kitchen = Division(divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse", divON: 0, divTemp: "16");
+    Division alexandersBedroom = Division(divName: "user1:UsersHouse:alexandersBedroom", houseName: "user1:UsersHouse", divON: 0, divTemp: "16");
+    await db.insert('division', kitchen.toMap());
+    await db.insert('division', alexandersBedroom.toMap());
+
+    Light alexandersLight = Light(lightName: "AlexandersLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:alexandersBedroom", isOn: 0, color: "");
+    Device alexandersLightDev = Device(devName: "AlexandersLight", isOn: 0, type: "light");
+    Light kitchenMainLight = Light(lightName: "kitchenMainLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, color: "");
+    Device kitchenMainLightDev = Device(devName: "kitchenMainLight", isOn: 0, type: "light");
+
+    await db.insert('light', alexandersLight.toMap());
+    await db.insert('light', kitchenMainLight.toMap());
+    await db.insert('device', alexandersLightDev.toMap());
+    await db.insert('device', kitchenMainLightDev.toMap());
 
     print('Default users inserted.');
   }
@@ -59,7 +86,7 @@ class LocalDB {
   Future<bool> login(String username, String password) async {
     try {
       final db = await initDB();
-      // Query the session table to check if the user exists
+
       List<Map<String, dynamic>> result = await db.query(
         'users',
         where: 'username = ?',
@@ -67,24 +94,23 @@ class LocalDB {
       );
 
       if (result.isEmpty) {
-        // No user found with that username
+
         return false;
       }
 
-      // Get the stored password
+
       String storedPassword = result[0]['password'];
 
-      // Here you should use a proper password hash comparison,
-      // for simplicity, we will just compare the plain text password
+
       if (storedPassword == password) {
-        // Login successful, you can add session logic or user-specific actions here
+
         User user = User.fromMap(result[0]);
         loginUser(user);
         print('Login successful');
 
         return true;
       } else {
-        // Password mismatch
+
         print('Incorrect password');
         return false;
       }
@@ -110,31 +136,45 @@ class LocalDB {
     return existingUsers.isNotEmpty;
   }
 
-
-
   Future<void> registerUser(User user) async {
     final db = await initDB();
     await db.insert('users', user.toMap());
   }
-  Future<String> getUsername() async {
+
+  Future<String> getLoginUsername() async {
     final db = await initDB();
-    List<Map<String, Object?>> usernameQuery = await db.rawQuery('SELECT username FROM tokens');
+    List<Map<String, Object?>> usernameQuery = await db.rawQuery('SELECT username FROM session');
     final username = usernameQuery.first.values.first.toString();
     print(username);
     return username;
   }
 
-
-
-  Future<List<Map<String, Object?>>> getGroupMessages(String groupName) async {
+  Future<User> getLoginUser() async {
     final db = await initDB();
-    try {
-      List<Map<String, Object?>> usernameQuery = await db.rawQuery("SELECT * FROM messages WHERE groupName LIKE '$groupName'");
-      return usernameQuery;
-    } catch (e) {
-      print('Error retrieving messages: $e');
-      return []; // Return an empty list or handle the error in another way
-    }
+    List<Map<String, Object?>> usernameQuery = await db.rawQuery('SELECT * FROM session');
+    User user = usernameQuery.map((map) => User.fromMap(map)).toList().first;
+    print(user);
+    return user;
+  }
+
+  Future<List<Division>> getDivisions(String houseName) async {
+    final db = await initDB();
+
+    List<Map<String, Object?>> result = await db.query(
+        'division',
+        where: 'houseName = ?',
+        whereArgs: [houseName]
+    );
+
+    List<Division> divisions = result.map((map) => Division.fromMap(map)).toList();
+
+    return divisions;
+  }
+
+  Future<void> addDivision(Division div) async {
+    final db = await initDB();
+    await db.insert('division', div.toMap());
+    print("DIVISION ADDED TO DB");
   }
 
   Future<String> getToken() async {
@@ -280,6 +320,30 @@ class LocalDB {
       if (existingTables.contains('session')) {
         print("DELETANIS A SESSION");
         await txn.delete('session');
+      }
+      if (existingTables.contains('casa')) {
+        print("DELETANIS A casa");
+        await txn.delete('casa');
+      }
+      if (existingTables.contains('division')) {
+        print("DELETANIS A division");
+        await txn.delete('division');
+      }
+      if (existingTables.contains('device')) {
+        print("DELETANIS A device");
+        await txn.delete('device');
+      }
+      if (existingTables.contains('light')) {
+        print("DELETANIS A light");
+        await txn.delete('light');
+      }
+      if (existingTables.contains('ac')) {
+        print("DELETANIS A ac");
+        await txn.delete('ac');
+      }
+      if (existingTables.contains('virtualAssist')) {
+        print("DELETANIS A virtualAssist");
+        await txn.delete('virtualAssist');
       }
       //  await txn.delete('openPolls');
       //   await txn.delete('closedPolls');

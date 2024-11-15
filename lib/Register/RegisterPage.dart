@@ -79,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _showAlertDialog(context, "User already exists with this username.");
     } else {
 
-      User newUser = User(username: username, password: password, email: email);
+      User newUser = User(username: username, password: password, email: email, casa: "House");
       await db.registerUser(newUser);
       _showAlertDialog(context, "User registered successfully.");
     }
