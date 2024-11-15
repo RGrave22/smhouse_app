@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smhouse_app/HomePage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:smhouse_app/Profile/ProfilePage.dart';
 
 import 'Login/LoginPage.dart';
 
@@ -95,7 +96,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
    * ADICIONAR PAGINA NO ARRAY dos SCREENS E VERIFICAR O NUMERO PARA QUANDO CARREGAR LA IR PARA A PAGINA
    */
   final screens = [
-    const HomePage(), //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE
+    const HomePage(),
+    //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE
   ];
 
   @override
@@ -121,9 +123,12 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                navigateToPage(9); //mudar para o numero da pagina do userPage
-              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              );
             },
             icon: const Icon(Icons.account_circle, color: Colors.teal),
             iconSize: 50,

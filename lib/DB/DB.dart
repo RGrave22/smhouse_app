@@ -45,6 +45,8 @@ class LocalDB {
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT)');
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acTimer TEXT, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarm INTEGER)');
+      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
+      await txn.execute('CREATE TABLE deviceRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
     });
 
   }
@@ -169,6 +171,21 @@ class LocalDB {
     List<Division> divisions = result.map((map) => Division.fromMap(map)).toList();
 
     return divisions;
+  }
+
+  Future<List<User>> getFamily(String houseName) async {
+    final db = await initDB();
+
+    List<Map<String, Object?>> result = await db.query(
+        'users',
+        where: 'casa = ?',
+        whereArgs: [houseName]
+    );
+
+    print(result);
+    List<User> family = result.map((map) => User.fromMap(map)).toList();
+
+    return family;
   }
 
   Future<void> addDivision(Division div) async {
@@ -344,6 +361,14 @@ class LocalDB {
       if (existingTables.contains('virtualAssist')) {
         print("DELETANIS A virtualAssist");
         await txn.delete('virtualAssist');
+      }
+      if (existingTables.contains('divRestriction')) {
+        print("DELETANIS A divRestriction");
+        await txn.delete('divRestriction');
+      }
+      if (existingTables.contains('deviceRestriction')) {
+        print("DELETANIS A deviceRestriction");
+        await txn.delete('deviceRestriction');
       }
       //  await txn.delete('openPolls');
       //   await txn.delete('closedPolls');
