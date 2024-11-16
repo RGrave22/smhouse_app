@@ -2,8 +2,8 @@ class Light {
   final String lightName;
   final String houseName;
   final String divName;
-  final int isOn;
-  final String color;
+  late int isOn;
+  late String color;
 
   Light({
     required this.lightName,

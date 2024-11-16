@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/Light/LightPage.dart';
 import 'package:smhouse_app/Register/RegisterPage.dart';
 import 'package:smhouse_app/main.dart';
@@ -59,6 +60,10 @@ class _LightPageState extends State<LightPage> {
     return light.color;
   }
 
+  void setLightColor(String newColor){
+    light.color = newColor;
+  }
+
   String getLightColorAsset() {
     if (light.color != "") {
       return 'assets/Lamp_${light.color}.png';
@@ -71,20 +76,29 @@ class _LightPageState extends State<LightPage> {
     return light.divName.split(":")[2];
   }
 
-  //TODO: Implement color change function
-  void _changeColor(String newColor) {
-    db.updateLightColor(light.lightName, newColor);
-  }
+void _changeColor(String newColor) async {
+  await db.updateLightColor(light.lightName, newColor);
+  setState(() {
+    setLightColor(newColor); 
+  });
+}
 
-  void _turnOnOrOff() {
-      int newIsOn = (light.isOn == 1) ? 0 : 1;
+
+  void _turnOnOrOff() async {
+    int newIsOn = (light.isOn == 1) ? 0 : 1;
     Device updatedDevice = Device(
       devName: light.lightName,
       isOn: newIsOn, type: 'light', divName: light.divName, houseName: light.houseName,
     );
     light = Light(lightName: light.lightName, houseName: light.houseName, divName: light.divName, isOn: newIsOn, color: "");
     print(light.isOn.toString());
-    db.updateDeviceStatus(updatedDevice, newIsOn);
+    
+    await db.updateDeviceStatus(updatedDevice, newIsOn);
+
+    setState(() {
+        light.isOn = newIsOn;
+    });
+
   }
 
 
@@ -187,31 +201,35 @@ class _LightPageState extends State<LightPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        leading: IconButton(
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-          icon: const Icon(Icons.menu, color: Colors.teal),
+       appBar: AppBar(
+          elevation: 0,
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.teal),
           iconSize: 50,
+          onPressed: () {
+            Navigator.pop(
+              context,
+            );
+          },
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.account_circle, color: Colors.teal),
-            iconSize: 50,
-          ),
-        ],
-      ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.account_circle, color: Colors.teal),
+              iconSize: 50,
+            ),
+          ],
+          
+        ),
+
       body:
       isLoading
           ? const Center(

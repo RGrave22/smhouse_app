@@ -233,21 +233,20 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
         child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Header
         Padding(
         padding: const EdgeInsets.only(top: 50.0),
         child: Column(
           children: [
             const CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/Logo_init.jpeg'), // Replace with your actual image asset
+              backgroundImage: AssetImage('assets/Logo_init.jpeg'), 
             ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  div.divName.split(":")[2], // Show the room name
+                  div.divName.split(":")[2], 
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -255,7 +254,7 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
-                  onPressed: _showEditDialog, // Call the function to open the popup
+                  onPressed: _showEditDialog, 
                 ),
               ],
             ),
@@ -271,16 +270,23 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.only(bottom: 50.0),
-            child: FloatingActionButton(
-              onPressed: () {
-                _showAddRoomDialog();
-                print('Add Device Button Pressed for ${widget.divName}');
-              },
-              child: const Icon(Icons.add),
+        Center(
+              child: ElevatedButton(
+                onPressed: _showAddRoomDialog, 
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(20),
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 20),
+          
         ],
       ),
     ));

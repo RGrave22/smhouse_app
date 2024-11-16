@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smhouse_app/HomePage.dart';
-import 'package:smhouse_app/Light/LightPage.dart';
+import 'package:smhouse_app/Login/LoginPage.dart';
+import 'package:smhouse_app/Settings/SettingsPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/Profile/ProfilePage.dart';
-import 'package:smhouse_app/RoomPage/RoomPage.dart';
-
-import 'Login/LoginPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,6 +11,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -60,52 +59,79 @@ class MyApp extends StatelessWidget {
             )
         ));
   }
-
 }
-class MainPage extends StatefulWidget {
 
+class MainPage extends StatefulWidget {
   const MainPage({super.key});
+  
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
-  final _navigatorKey = GlobalKey<NavigatorState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   late TabController _tabController;
-
+  int currentIndex = 0;
+  
+  final _navigatorKey = GlobalKey<NavigatorState>();
   late String username = "";
 
-  int currentIndex = 0;
 
-  void navigateToPage(int index) {
-    setState(() { 
-      currentIndex = index;
-      _tabController.animateTo(index);
-    });
-  }
-
- @override
-  void initState() {
-
-    super.initState();
-      _tabController = TabController(length: screens.length, vsync: this);
-  }
-
-  /**
-   * ADICIONAR PAGINA NO ARRAY dos SCREENS E VERIFICAR O NUMERO PARA QUANDO CARREGAR LA IR PARA A PAGINA
-   */
-  final screens = [
+  // Separando as páginas da Bottom Navigation Bar
+  final List<Widget> tabBarScreens = [
     const HomePage(),
-    //VER SE PODE FICAR AQUI ISTO ASSIM GRAVE
   ];
+
+  // Controla o estado da Bottom Navigation Bar
+  final List<Tab> tabBarItems = const [
+    Tab(icon: Icon(FontAwesomeIcons.house, color: Colors.white)),
+  ];
+
+  // Separando as páginas e itens do Hamburger Menu
+  final List<Widget> hamburgerMenuScreens = [
+    const HomePage(),
+    const SettingsPage(),
+    const ProfilePage(),
+  ];
+
+  final List<Map<String, dynamic>> hamburgerMenuItems = [
+    {'icon': FontAwesomeIcons.house, 'title': 'Menu Principal', 'index': 0},
+    {'icon': FontAwesomeIcons.gear, 'title': 'Settings', 'index': 1},
+    {'icon': FontAwesomeIcons.user, 'title': 'Profile', 'index': 2},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: tabBarItems.length, vsync: this);
+  }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  /// Navegação para as páginas da TabBar
+  void onTabBarItemTapped(int index) {
+    setState(() {
+      currentIndex = index;
+      _tabController.animateTo(index);
+    });
+  }
+
+  /// Navegação para as páginas do Hamburger Menu
+  void onHamburgerMenuItemTapped(int index) {
+    Navigator.pop(context);
+    if (index < tabBarScreens.length) {
+      onTabBarItemTapped(index); // Navega pela TabBar
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => hamburgerMenuScreens[index]),
+      );
+    }
   }
 
   @override
@@ -114,7 +140,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       key: _scaffoldKey,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
@@ -127,9 +153,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
             },
             icon: const Icon(Icons.account_circle, color: Colors.teal),
@@ -143,221 +167,37 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           children: [
             DrawerHeader(
               decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 255, 255, 255),
+                color: Colors.white,
               ),
               child: Center(
                 child: FractionallySizedBox(
-                  widthFactor: 0.9, 
-                  heightFactor: 0.9, 
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        'assets/Logo_init.jpeg',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
+                  widthFactor: 0.9,
+                  heightFactor: 0.9,
+                  child: Image.asset('assets/Logo_init.jpeg', fit: BoxFit.contain),
                 ),
               ),
             ),
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.house),
-              title: const Text('Menu Principal'),
-              onTap: () {
-                navigateToPage(0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.map),
-              title: const Text('Mapa'),
-              onTap: () {
-                navigateToPage(1);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.userGroup),
-              title: const Text('Grupos'),
-              onTap: () {
-                navigateToPage(3);
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.chalkboardUser),
-              title: const Text('Tutores'),
-              onTap: () {
-                navigateToPage(4);
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.newspaper),
-              title: const Text('Noticias'),
-              onTap: () {
-                navigateToPage(5);
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.searchengin),
-              title: const Text('Perdidos e Achados'),
-              onTap: () {
-                navigateToPage(1);
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.utensils),
-              title: const Text('Refeitorio'),
-              onTap: () {
-                navigateToPage(6);
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.circleInfo),
-              title: const Text('Sobre Nós'),
-              onTap: () {
-                navigateToPage(7);
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.gear),
-              title: const Text('Definições'),
-              onTap: () {
-                navigateToPage(8);
-                Navigator.pop(context);
-              },
-            ),
-
-      
-
+            // Itens do Hamburger Menu
+            ...hamburgerMenuItems.map((item) {
+              return ListTile(
+                leading: FaIcon(item['icon']),
+                title: Text(item['title']),
+                onTap: () => onHamburgerMenuItemTapped(item['index']),
+              );
+            }).toList(),
           ],
         ),
       ),
-      body: screens[
-          currentIndex], 
-
+      body: tabBarScreens.isNotEmpty ? tabBarScreens[currentIndex] : const SizedBox(),
       bottomNavigationBar: Container(
         height: 42,
         color: const Color.fromARGB(255, 2, 58, 103),
         child: TabBar(
           controller: _tabController,
-          onTap: (index) => setState(() => currentIndex = index),
-          isScrollable: true,
-          tabs: const [
-            SizedBox(
-              width: 50,
-              child: Tab(
-                icon: Icon(
-                  FontAwesomeIcons.house,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: Icon(
-          //         FontAwesomeIcons.searchengin,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: Icon(
-          //         FontAwesomeIcons.map,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         FontAwesomeIcons.userGroup,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         FontAwesomeIcons.chalkboardUser,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         FontAwesomeIcons.newspaper,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         FontAwesomeIcons.utensils,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         FontAwesomeIcons.circleInfo,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         FontAwesomeIcons.gear,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     width: 50,
-          //     child: Tab(
-          //       icon: FaIcon(
-          //         Icons.person,
-          //         size: 38,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-           ],
+          onTap: (index) => onTabBarItemTapped(index),
+          tabs: tabBarItems,
         ),
       ),
     );
   }
 }
-
-
-
-
