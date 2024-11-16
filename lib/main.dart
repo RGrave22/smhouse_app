@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smhouse_app/HomePage.dart';
+import 'package:smhouse_app/Light/LightPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/Profile/ProfilePage.dart';
 import 'package:smhouse_app/RoomPage/RoomPage.dart';
@@ -176,7 +177,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
               leading: const FaIcon(FontAwesomeIcons.map),
               title: const Text('Mapa'),
               onTap: () {
-                navigateToPage(2);
+                navigateToPage(1);
                 Navigator.pop(context);
               },
             ),

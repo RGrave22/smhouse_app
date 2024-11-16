@@ -8,6 +8,7 @@ import 'package:smhouse_app/main.dart';
 import '../DB/DB.dart';
 import '../Data/Device.dart';
 import '../HomePage.dart';
+import '../Light/LightPage.dart';
 import '../Profile/ProfilePage.dart';
 
 class RoomPage extends StatefulWidget {
@@ -71,10 +72,9 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
       int index = devices.indexOf(device);
       if (index != -1) {
         devices[index] = updatedDevice;
+        db.updateDeviceStatus(updatedDevice, value ? 1 : 0);
       }
     });
-
-    db.updateDeviceStatus(devName, value ? 1 : 0);
   }
 
 
@@ -371,7 +371,10 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => RoomPage(divName: dev.divName)),
+            //TODO: Send to correct device page
+            //TODO: Create function to choose correct page type depending on device type
+            // MaterialPageRoute(builder: (context) => RoomPage(divName: dev.divName)),
+            MaterialPageRoute(builder: (context) => LightPage(lightName: dev.devName)),
           );
         },
       ),

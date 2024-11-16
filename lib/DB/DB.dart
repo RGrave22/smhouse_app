@@ -174,6 +174,21 @@ class LocalDB {
     return divisions;
   }
 
+  Future<Light> getLight(String lightName) async {
+    final db = await initDB();
+
+    List<Map<String, Object?>> result = await db.query(
+        'light',
+        where: 'lightName = ?',
+        whereArgs: [lightName]
+    );
+
+    print(result);
+    Light light = result.map((map) => Light.fromMap(map)).toList().first;
+
+    return light;
+  }
+
   Future<List<User>> getFamily(String houseName) async {
     final db = await initDB();
 
@@ -241,12 +256,76 @@ class LocalDB {
     return division;
   }
 
-  Future<void> updateDeviceStatus(String devName, int status) async {
+
+  Future<void> updateDeviceName(Device dev, String newName) async {
     final db = await initDB();
-    await db.rawUpdate(
-      'UPDATE device SET isOn = ? WHERE devName = ?',
-      [status, devName],
-    );
+    String devName =  dev.devName;
+    String type = dev.type;
+    String divName = dev.divName;
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE device SET devName = ? WHERE devName = ? and divName = ?',
+        [newName, devName, divName],
+      );
+
+      switch (type) {
+        case 'ac':
+          await txn.rawUpdate(
+            'UPDATE ac SET acName = ? WHERE acName = ? and divName = ?',
+            [newName, devName, divName],
+          );
+          break;
+        case 'virtualAssist':
+          await txn.rawUpdate(
+            'UPDATE virtualAssist SET vaName = ? WHERE vaName = ? and divName = ?',
+            [newName, devName, divName],
+          );
+          break;
+        case 'light':
+          await txn.rawUpdate(
+            'UPDATE light SET lightName = ? WHERE lightName = ? and divName = ?',
+            [newName, devName, divName],
+          );
+          break;
+        default:
+      }
+    });
+  }
+
+
+  Future<void> updateDeviceStatus(Device dev, int status) async {
+    final db = await initDB();
+    String devName =  dev.devName;
+    String type = dev.type;
+    String divName = dev.divName;
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE device SET isOn = ? WHERE devName = ? and divName = ?',
+        [status, devName, divName],
+      );
+
+      switch (type) {
+        case 'ac':
+          await txn.rawUpdate(
+            'UPDATE ac SET isOn = ? WHERE acName = ? and divName = ?',
+            [status, devName, divName],
+          );
+          break;
+        case 'virtualAssist':
+          await txn.rawUpdate(
+            'UPDATE virtualAssist SET isOn = ? WHERE vaName = ? and divName = ?',
+            [status, devName, divName],
+          );
+          break;
+        case 'light':
+          await txn.rawUpdate(
+            'UPDATE light SET isOn = ? WHERE lightName = ? and divName = ?',
+            [status, devName, divName],
+          );
+          break;
+        default:
+      }
+    });
   }
 
   Future<void> updateDivName(String divName, String oldName) async {
@@ -276,6 +355,18 @@ class LocalDB {
       );
     });
   }
+
+  Future<void> updateLightColor(String lightName, String color) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE light SET color = ? WHERE lightName = ?',
+        [color, lightName],
+      );
+    });
+  }
+
 
   Future<void> createDevice(Device device) async {
     final db = await initDB();
