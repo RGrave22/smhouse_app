@@ -249,6 +249,34 @@ class LocalDB {
     );
   }
 
+  Future<void> updateDivName(String divName, String oldName) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE division SET divName = ? WHERE divName = ?',
+        [divName, oldName],
+      );
+
+      await txn.rawUpdate(
+        'UPDATE device SET divName = ? WHERE divName = ?',
+        [divName, oldName],
+      );
+      await txn.rawUpdate(
+        'UPDATE light SET divName = ? WHERE divName = ?',
+        [divName, oldName],
+      );
+      await txn.rawUpdate(
+        'UPDATE ac SET divName = ? WHERE divName = ?',
+        [divName, oldName],
+      );
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET divName = ? WHERE divName = ?',
+        [divName, oldName],
+      );
+    });
+  }
+
 
   Future<String> getToken() async {
     final db = await initDB();

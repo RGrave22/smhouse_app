@@ -22,6 +22,7 @@ class RoomPage extends StatefulWidget {
 
 class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController _roomNameController = TextEditingController();
   final LocalDB db = LocalDB('SmHouse');
 
   bool isLoading = true;
@@ -79,9 +80,11 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           elevation: 0,
@@ -208,7 +211,6 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                   Navigator.pop(context);
                 },
               ),
-
               ListTile(
                 leading: const FaIcon(FontAwesomeIcons.gear),
                 title: const Text('Definições'),
@@ -217,38 +219,49 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                   Navigator.pop(context);
                 },
               ),
-
-
-
             ],
           ),
         ),
       backgroundColor: Colors.white,
-      body: Center(
+      body: isLoading
+          ? const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+        ),
+      )
+          :Center(
         child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Header
-          Padding(
-            padding: const EdgeInsets.only(top: 50.0),
-            child: Column(
+        Padding(
+        padding: const EdgeInsets.only(top: 50.0),
+        child: Column(
+          children: [
+            const CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('assets/Logo_init.jpeg'), // Replace with your actual image asset
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage(
-                      'assets/Logo_init.jpeg'), // Replace with your actual image asset
-                ),
-                const SizedBox(height: 16),
                 Text(
-                  widget.divName.split(":")[2],
+                  div.divName.split(":")[2], // Show the room name
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: _showEditDialog, // Call the function to open the popup
+                ),
               ],
             ),
-          ),
+          ],
+        ),
+      ),
 
           Expanded(
             child: ListView(
@@ -271,6 +284,51 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
         ],
       ),
     ));
+  }
+
+  void _showEditDialog() {
+    _roomNameController.text = div.divName.split(":")[2];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Room Name'),
+          content: TextField(
+            controller: _roomNameController,
+            decoration: const InputDecoration(
+              labelText: 'Room Name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  List<String> name = div.divName.split(":");
+                  String newName = "${name[0]}:${name[1]}:${_roomNameController.text}";
+                  db.updateDivName(newName, div.divName);
+
+                  div = Division(
+                    divName: newName,
+                    houseName: div.houseName,
+                    divON: div.divON,
+                    divTemp: div.divTemp,
+                  );
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildDeviceCard(BuildContext context, Device dev, bool isDeviceOn, ValueChanged<bool> onChanged) {
@@ -433,7 +491,7 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                 ElevatedButton(
                   onPressed: () {
 
-                  
+
                     Navigator.of(context).pop();
                     setState(() {
 
