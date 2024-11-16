@@ -399,7 +399,7 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                     const Expanded(
                       child: Center(
                         child: Text(
-                          'Add Room',
+                          'Add Device',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -432,18 +432,32 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
   }
 
   Widget _buildDeviceOption(IconData icon, String label) {
+    String deviceTipe = "";
+    switch (label) {
+      case 'Air Conditioner':
+        deviceTipe = "ac";
+        break;
+      case 'Virtual Assistant':
+        deviceTipe = "virtualAssist";
+        break;
+      case 'Light':
+        deviceTipe = "light";
+        break;
+      default:
+    }
+
     return ListTile(
       leading: Icon(icon, color: Colors.teal),
       title: Text(label, style: const TextStyle(color: Colors.teal)),
       onTap: () {
         Navigator.of(context).pop();
-        _showEditDeviceDialog(label);
+        _showEditDeviceDialog(deviceTipe);
       },
     );
   }
 
-  void _showEditDeviceDialog(String roomType) {
-    TextEditingController _roomNameController = TextEditingController();
+  void _showEditDeviceDialog(String deviceType) {
+    TextEditingController _devNameController = TextEditingController();
 
     showDialog(
       context: context,
@@ -460,11 +474,11 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: Center(
                         child: Text(
-                          'Edit Room - $roomType',
-                          style: const TextStyle(
+                          'Edit Device',
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -481,9 +495,9 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                 ),
                 const SizedBox(height: 10),
                 TextField(
-                  controller: _roomNameController,
+                  controller: _devNameController,
                   decoration: const InputDecoration(
-                    labelText: 'Room Name',
+                    labelText: 'Device Name',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -491,13 +505,14 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                 ElevatedButton(
                   onPressed: () {
 
-
+                    Device device = Device(devName: _devNameController.text, isOn: 0, type: deviceType, divName: div.divName, houseName: div.houseName);
                     Navigator.of(context).pop();
                     setState(() {
-
+                      devices.add(device);
                     });
+                    db.createDevice(device);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Room  created!')),
+                      const SnackBar(content: Text('Device created!')),
                     );
                   },
                   style: ElevatedButton.styleFrom(

@@ -2,10 +2,12 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
+import 'package:smhouse_app/Data/Ac.dart';
 import 'package:smhouse_app/Data/Casa.dart';
 import 'package:smhouse_app/Data/Device.dart';
 import 'package:smhouse_app/Data/Division.dart';
 import 'package:smhouse_app/Data/Light.dart';
+import 'package:smhouse_app/Data/VirtualAssist.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../Data/User.dart';
@@ -210,7 +212,6 @@ class LocalDB {
   Future<List<Device>> getDevicesOfDivision(String divName) async {
     final db = await initDB();
 
-
     List<Map<String, dynamic>> result = await db.rawQuery(
       'SELECT * FROM device WHERE divName = ?',
       [divName],
@@ -227,7 +228,6 @@ class LocalDB {
 
   Future<Division> getDivision(String divName) async {
     final db = await initDB();
-
 
     List<Map<String, dynamic>> result = await db.rawQuery(
       'SELECT * FROM division WHERE divName = ?',
@@ -277,6 +277,26 @@ class LocalDB {
     });
   }
 
+  Future<void> createDevice(Device device) async {
+    final db = await initDB();
+    await db.insert('device', device.toMap());
+
+    switch (device.type) {
+      case 'ac':
+        db.insert('ac', AC(acName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, acMode: "Cool", acTimer: "", swingModeOn: 0, airDirection: 50, acTemp: 16).toMap());
+        print("inserted ac");
+        break;
+      case 'virtualAssist':
+        db.insert("virtualAssist", VirtualAssist(vaName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarm: 0).toMap());
+        print("inserted virtual");
+        break;
+      case 'light':
+        db.insert("light", Light(lightName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, color: "").toMap());
+        print("inserted Light");
+        break;
+      default:
+    }
+  }
 
   Future<String> getToken() async {
     final db = await initDB();
