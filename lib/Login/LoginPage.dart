@@ -44,12 +44,12 @@ class _LoginScreenState extends State<LoginScreen> {
     bool loginSuccess = await db.login(username, password);
 
     if (loginSuccess) {
-      _showAlertDialog('Login Successful', 'Welcome, $username!');
+      //_showAlertDialog('Login Successful', 'Welcome, $username!');
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MainPage(),
+          builder: (context) => const MainPage(),
         ),
       );
     } else {

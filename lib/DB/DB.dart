@@ -33,7 +33,6 @@ class LocalDB {
     return db;
   }
 
-
   Future<void> _onCreate(Database db, int version) async {
     print('onCreate');
     await db.transaction((txn) async {
@@ -41,7 +40,7 @@ class LocalDB {
       await txn.execute('CREATE TABLE session (username TEXT PRIMARY KEY, password TEXT, email TEXT, casa TEXT)');
       await txn.execute('CREATE TABLE casa (houseName TEXT PRIMARY KEY, houseTemp TEXT, houseOn INTEGER)');
       await txn.execute('CREATE TABLE division (divName TEXT PRIMARY KEY, houseName TEXT, divON INTEGER, divTemp)');
-      await txn.execute('CREATE TABLE device (devName TEXT PRIMARY KEY, isOn INTEGER, type TEXT)');
+      await txn.execute('CREATE TABLE device (devName TEXT PRIMARY KEY, divName TEXT, houseName TEXT, isOn INTEGER, type TEXT)');
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT)');
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acTimer TEXT, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarm INTEGER)');
@@ -72,9 +71,9 @@ class LocalDB {
     await db.insert('division', alexandersBedroom.toMap());
 
     Light alexandersLight = Light(lightName: "AlexandersLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:alexandersBedroom", isOn: 0, color: "");
-    Device alexandersLightDev = Device(devName: "AlexandersLight", isOn: 0, type: "light");
+    Device alexandersLightDev = Device(devName: "AlexandersLight", isOn: 0, type: "light", divName: "user1:UsersHouse:alexandersBedroom", houseName: "user1:UsersHouse");
     Light kitchenMainLight = Light(lightName: "kitchenMainLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, color: "");
-    Device kitchenMainLightDev = Device(devName: "kitchenMainLight", isOn: 0, type: "light");
+    Device kitchenMainLightDev = Device(devName: "kitchenMainLight", isOn: 0, type: "light", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
 
     await db.insert('light', alexandersLight.toMap());
     await db.insert('light', kitchenMainLight.toMap());
@@ -193,6 +192,63 @@ class LocalDB {
     await db.insert('division', div.toMap());
     print("DIVISION ADDED TO DB");
   }
+
+  Future<int> countDevicesOnInDivision(String divName) async {
+    final db = await initDB();
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM device WHERE divName = ? AND isOn = ?',
+        [divName, 1] // 1 indicates the device is on
+    );
+
+    int count = result.first['count'] as int;
+    print('Number of devices ON in division $divName: $count');
+
+    return count;
+  }
+
+  Future<List<Device>> getDevicesOfDivision(String divName) async {
+    final db = await initDB();
+
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT * FROM device WHERE divName = ?',
+      [divName],
+    );
+
+    List<Device> devices = result.map((deviceMap) {
+      return Device.fromMap(deviceMap);
+    }).toList();
+
+    print('Devices in division $divName: ${devices.length}');
+
+    return devices;
+  }
+
+  Future<Division> getDivision(String divName) async {
+    final db = await initDB();
+
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT * FROM division WHERE divName = ?',
+      [divName],
+    );
+
+    Division division = result.map((divMap) {
+      return Division.fromMap(divMap);
+    }).toList().first;
+
+    return division;
+  }
+
+  Future<void> updateDeviceStatus(String devName, int status) async {
+    final db = await initDB();
+    await db.rawUpdate(
+      'UPDATE device SET isOn = ? WHERE devName = ?',
+      [status, devName],
+    );
+  }
+
 
   Future<String> getToken() async {
     final db = await initDB();

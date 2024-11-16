@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smhouse_app/RoomPage/RoomPage.dart';
 
 import 'DB/DB.dart';
 import 'Data/Division.dart';
@@ -61,6 +62,12 @@ class _HomePageState extends State<HomePage> {
     print(rooms);
   }
 
+  Future<String> getDivDevicesOn(String divName) async {
+    int devicesOn = await db.countDevicesOnInDivision(divName);
+
+    return devicesOn.toString();
+  }
+
   // Método para exibir o popup de seleção de tipo de sala
   void _showAddRoomDialog() {
     showDialog(
@@ -106,6 +113,7 @@ class _HomePageState extends State<HomePage> {
                 _buildRoomOption(Icons.bed, "BedRoom"),
                 _buildRoomOption(Icons.garage, "Garage"),
                 _buildRoomOption(Icons.computer, "Office"),
+                _buildRoomOption(Icons.tv_rounded, "Living Room"),
               ],
             ),
           ),
@@ -232,20 +240,20 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildWeatherInfo("Weather", "22°"),
-                    _buildWeatherInfo("Temp House", getHouseTemp()),
+                    _buildWeatherInfo("House Temp", getHouseTemp()),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Your House:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              "${user.casa.split(":")[1]}:",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Expanded(
               child: ListView(
                 children: rooms
-                    .map((room) => _buildRoomCard(getDivName(room.divName), 'Devices On'))
+                    .map((room) => _buildRoomCard(context, room.divName, getDivDevicesOn(room.divName)))
                     .toList(),
               ),
             ),
@@ -298,16 +306,29 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRoomCard(String roomName, String devicesOn) {
+  Widget _buildRoomCard(BuildContext  context, String roomName, Future<String> devicesOnFuture) {
     return Card(
       elevation: 2,
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundImage: AssetImage('assets/Logo_init.jpeg'),
-        ),
-        title: Text(roomName),
-        subtitle: Text(devicesOn),
-        trailing: const Icon(Icons.chevron_right),
+      child: FutureBuilder<String>(
+        future: devicesOnFuture,
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          String devicesOnText = snapshot.data ?? 'Loading...';
+          return ListTile(
+            leading: const CircleAvatar(
+              backgroundImage: AssetImage('assets/Logo_init.jpeg'),
+            ),
+            title: Text(getDivName(roomName)),
+            subtitle: Text("Devices on: $devicesOnText"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => RoomPage(divName: roomName)),
+              );
+            },
+          );
+        },
       ),
     );
   }
