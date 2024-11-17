@@ -52,6 +52,8 @@ dev_dependencies:
   localstorage: ^5.0.0
   flutter_colorpicker:
   fl_chart:
+  syncfusion_flutter_sliders: ^20.3.47
+  sleek_circular_slider: ^2.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

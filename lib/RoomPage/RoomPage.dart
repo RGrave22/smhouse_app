@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:smhouse_app/AC/ACPage.dart';
 import 'package:smhouse_app/Data/Division.dart';
 import 'package:smhouse_app/main.dart';
 
@@ -341,16 +342,16 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
     IconData deviceIcon;
     switch (dev.type) {
       case 'light':
-        deviceIcon = Icons.lightbulb; // Light icon for light devices
+        deviceIcon = Icons.lightbulb;
         break;
       case 'ac':
-        deviceIcon = Icons.air; // Fan icon for fan devices
+        deviceIcon = Icons.air;
         break;
       case 'virtualAssist':
-        deviceIcon = Icons.surround_sound; // TV icon for TV devices
+        deviceIcon = Icons.surround_sound;
         break;
       default:
-        deviceIcon = Icons.devices; // Default icon for unrecognized device types
+        deviceIcon = Icons.devices;
         break;
     }
 
@@ -359,11 +360,11 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.teal,
-          child: Icon(deviceIcon, color: Colors.white), // Display icon based on device type
+          child: Icon(deviceIcon, color: Colors.white),
         ),
         title: Text(dev.devName),
         trailing: Row(
-          mainAxisSize: MainAxisSize.min, // Ensures the row takes the minimum space required
+          mainAxisSize: MainAxisSize.min,
           children: [
             Switch(
               value: isDeviceOn,
@@ -375,13 +376,27 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
           ],
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            //TODO: Send to correct device page
-            //TODO: Create function to choose correct page type depending on device type
-            // MaterialPageRoute(builder: (context) => RoomPage(divName: dev.divName)),
-            MaterialPageRoute(builder: (context) => LightPage(lightName: dev.devName)),
-          );
+          switch (dev.type) {
+            case 'light':
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LightPage(lightName: dev.devName)),
+              );
+              break;
+            case 'ac':
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AcPage(acName: dev.devName)),
+              );
+              break;
+            case 'virtualAssist':
+
+              break;
+            default:
+
+              break;
+          }
+
         },
       ),
     );

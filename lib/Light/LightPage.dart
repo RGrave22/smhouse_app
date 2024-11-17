@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:smhouse_app/HomePage.dart';
 import 'package:smhouse_app/Light/LightPage.dart';
 import 'package:smhouse_app/Register/RegisterPage.dart';
+import 'package:smhouse_app/RoomPage/RoomPage.dart';
 import 'package:smhouse_app/main.dart';
 import 'package:smhouse_app/Data/Light.dart';
 // import 'package:smhouse_app/Data/User.dart';
@@ -34,6 +36,7 @@ class _LightPageState extends State<LightPage> {
 
   late Division div;
   late Light light;
+  late double currentIntensity;
 
   @override
   void initState() {
@@ -47,6 +50,7 @@ class _LightPageState extends State<LightPage> {
     });
 
     light = await db.getLight(widget.lightName);
+    currentIntensity = light.intensity.toDouble();
 
     div = await db.getDivision(light.divName);
 
@@ -76,13 +80,21 @@ class _LightPageState extends State<LightPage> {
     return light.divName.split(":")[2];
   }
 
-void _changeColor(String newColor) async {
-  await db.updateLightColor(light.lightName, newColor);
-  setState(() {
-    setLightColor(newColor); 
-  });
-}
+  void _changeColor(String newColor) async {
+    await db.updateLightColor(light.lightName, newColor);
+    setState(() {
+      setLightColor(newColor);
+    });
+  }
 
+  Future<void> _updateIntensity(double newIntensity) async {
+    await db.updateLightIntensity(light.lightName, newIntensity.toInt());
+    setState(() {
+      currentIntensity = newIntensity;
+      light.intensity = newIntensity.toInt(); // Update local state
+    });
+    print(light);
+  }
 
   void _turnOnOrOff() async {
     int newIsOn = (light.isOn == 1) ? 0 : 1;
@@ -90,7 +102,7 @@ void _changeColor(String newColor) async {
       devName: light.lightName,
       isOn: newIsOn, type: 'light', divName: light.divName, houseName: light.houseName,
     );
-    light = Light(lightName: light.lightName, houseName: light.houseName, divName: light.divName, isOn: newIsOn, color: "");
+    light = Light(lightName: light.lightName, houseName: light.houseName, divName: light.divName, isOn: newIsOn, color: "", intensity: 0);
     print(light.isOn.toString());
     
     await db.updateDeviceStatus(updatedDevice, newIsOn);
@@ -211,6 +223,12 @@ void _changeColor(String newColor) async {
             Navigator.pop(
               context,
             );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoomPage(divName: light.divName),
+              ),
+            );
           },
         ),
           actions: [
@@ -244,12 +262,19 @@ void _changeColor(String newColor) async {
           children: [
             const SizedBox(height: 20),
             Center(
+              child: Text(
+                getDivName(),
+                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
                     light.lightName,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit),
@@ -260,9 +285,29 @@ void _changeColor(String newColor) async {
             ),
             const SizedBox(height: 20),
             Center(
-              child: Text(
-                getDivName(),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor:  Colors.teal,
+                  inactiveTrackColor: Colors.teal.withOpacity(0.3),
+                  thumbColor: Colors.teal,
+                  overlayColor: Colors.teal.withOpacity(0.2),
+                  trackHeight: 4.0,
+                  valueIndicatorColor: Colors.teal,
+                  valueIndicatorTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                child: Slider(
+                  value: currentIntensity,
+                  min: 0,
+                  max: 100,
+                  divisions: 10,
+                  label: '${currentIntensity.toInt()}',
+                  onChanged: (value) {
+                    _updateIntensity(value);
+                  },
+                ),
               ),
             ),
             (light.isOn != 0)

@@ -4,6 +4,7 @@ class Light {
   final String divName;
   late int isOn;
   late String color;
+  late int intensity;
 
   Light({
     required this.lightName,
@@ -11,6 +12,7 @@ class Light {
     required this.divName,
     required this.isOn,
     required this.color,
+    required this.intensity,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class Light {
       'divName': divName,
       'isOn': isOn,
       'color': color,
+      'intensity': intensity,
     };
   }
 
@@ -30,11 +33,12 @@ class Light {
       divName: map['divName'],
       isOn: map['isOn'],
       color: map['color'],
+      intensity: map['intensity'],
     );
   }
 
   @override
   String toString() {
-    return 'Light(lightName: $lightName, houseName: $houseName, divName: $divName, isOn: $isOn, color: $color)';
+    return 'Light(lightName: $lightName, houseName: $houseName, divName: $divName, isOn: $isOn, color: $color, intensity: $intensity)';
   }
 }
