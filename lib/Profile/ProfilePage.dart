@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smhouse_app/FamilyMember/FamilyMemberPage.dart';
 
 import '../DB/DB.dart';
 import '../Data/User.dart';
@@ -123,6 +124,12 @@ class _ProfilePage extends State<ProfilePage> {
                         child: Icon(Icons.person, color: Colors.white),
                       ),
                       title: Text(member.username),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FamilyMemberPage(familyMember: member)),
+                        );
+                      },
                       //subtitle: Text(member.username == houseAdm ? 'House Administrator' : '',)
                       //subtitle: Text(member['relation']!),
                     ),
