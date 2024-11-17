@@ -44,7 +44,7 @@ class LocalDB {
       await txn.execute('CREATE TABLE division (divName TEXT PRIMARY KEY, houseName TEXT, divON INTEGER, divTemp )');
       await txn.execute('CREATE TABLE device (devName TEXT PRIMARY KEY, divName TEXT, houseName TEXT, isOn INTEGER, type TEXT)');
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT, intensity INTEGER)');
-      await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acTimer TEXT, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
+      await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acHoursTimer INTEGER, acMinutesTimer INTEGER, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarm INTEGER)');
       await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
       await txn.execute('CREATE TABLE deviceRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
@@ -76,7 +76,7 @@ class LocalDB {
     Device alexandersLightDev = Device(devName: "AlexandersLight", isOn: 0, type: "light", divName: "user1:UsersHouse:alexandersBedroom", houseName: "user1:UsersHouse");
     Light kitchenMainLight = Light(lightName: "kitchenMainLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, color: "",  intensity: 0);
     Device kitchenMainLightDev = Device(devName: "kitchenMainLight", isOn: 0, type: "light", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
-    AC kitchenAC = AC(acName: "kitchenAC", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, acMode: "Cool", acTimer: "", swingModeOn: 0, airDirection: 0, acTemp: 0);
+    AC kitchenAC = AC(acName: "kitchenAC", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, acMode: "Cool", acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: 0, airDirection: 0, acTemp: 0);
     Device kitchenACDev = Device(devName: "kitchenAC", isOn: 0, type: "ac", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
 
     await db.insert('light', alexandersLight.toMap());
@@ -387,14 +387,67 @@ class LocalDB {
     });
   }
 
-  Future<void> updateLightIntensity(String lightName, int intsentity) async {
+  Future<void> updateLightIntensity(String lightName, int intensity) async {
     final db = await initDB();
 
     await db.transaction((txn) async {
       await txn.rawUpdate(
         'UPDATE light SET intensity = ? WHERE lightName = ?',
-        [intsentity, lightName],
+        [intensity, lightName],
       );
+    });
+  }
+
+  Future<void> updateACAirDirection(String acName, int airDirection) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE ac SET airDirection = ? WHERE acName = ?',
+        [airDirection, acName],
+      );
+    });
+  }
+
+  Future<void> updateACMode(String acName, String acMode) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE ac SET acMode = ? WHERE acName = ?',
+        [acMode, acName],
+      );
+    });
+  }
+
+  Future<void> updateACTimer(String acName, int acHoursTimer, int acMinutesTimer) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE ac SET acHoursTimer = ? and acMinutesTimer = ? WHERE acName = ?',
+        [acHoursTimer, acMinutesTimer, acName],
+      );
+    });
+  }
+  Future<void> updateACSwingMode(AC ac, bool swingMode) async {
+    final db = await initDB();
+
+    int newMode = swingMode ? 1 : 0;
+    print(newMode);
+    print(ac);
+    await db.transaction((txn) async {
+      if (swingMode) {
+        await txn.rawUpdate(
+          'UPDATE ac SET swingModeOn = ? and airDirection = ? WHERE acName = ?',
+          [newMode, 120, ac.acName],
+        );
+      } else {
+        await txn.rawUpdate(
+          'UPDATE ac SET swingModeOn = ? and airDirection = ? WHERE acName = ?',
+          [newMode, ac.airDirection, ac.acName],
+        );
+      }
     });
   }
 
@@ -404,7 +457,7 @@ class LocalDB {
 
     switch (device.type) {
       case 'ac':
-        db.insert('ac', AC(acName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, acMode: "Cool", acTimer: "", swingModeOn: 0, airDirection: 50, acTemp: 16).toMap());
+        db.insert('ac', AC(acName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, acMode: "Cool", acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: 0, airDirection: 50, acTemp: 16).toMap());
         print("inserted ac");
         break;
       case 'virtualAssist':
@@ -422,6 +475,7 @@ class LocalDB {
   Future<void> updateTemperature(int newTemp, AC ac) async {
     final db = await initDB();
 
+    print(ac);
     await db.transaction((txn) async {
       await txn.rawUpdate(
         'UPDATE ac SET acTemp = ? WHERE acName = ?',
