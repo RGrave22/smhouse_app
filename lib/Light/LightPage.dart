@@ -270,7 +270,7 @@ class _LightPageState extends State<LightPage> {
             const SizedBox(height: 20),
             Center(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     light.lightName,
@@ -395,7 +395,10 @@ class _LightPageState extends State<LightPage> {
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(10),
-                  // side: getColorBorder(Colors.red, Color(0xff63afC0))
+                  side: BorderSide(
+                    color: light.isOn == 1 ? Colors.green : Colors.grey, // Green if AC is ON, grey if OFF
+                    width: 3, // You can adjust the width as needed
+                  ),
                 ),
                 child: const Icon(
                   Icons.power_settings_new,
@@ -403,7 +406,7 @@ class _LightPageState extends State<LightPage> {
                   size: 50.0,
                 ),
               ),
-            ),
+            )
             // const SizedBox(height: 20),
           ],
         ),

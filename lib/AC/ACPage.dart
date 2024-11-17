@@ -34,6 +34,7 @@ class AcPageState extends State<AcPage> {
   late bool isSwingMode = false;
   late String acMode = "Cool";
   late String timer = "";
+  late int isOn = 0;
 
   @override
   void initState() {
@@ -54,13 +55,14 @@ class AcPageState extends State<AcPage> {
     temperature = ac.acTemp;
     acMode = ac.acMode;
     timer = ac.acTimer;
-
+    isOn = ac.isOn;
+    
     if(ac.swingModeOn== 1){
       isSwingMode = true;
     }else{
       isSwingMode = false;
     }
-
+    
     setState(() {
       isLoading = false;
     });
@@ -76,11 +78,11 @@ class AcPageState extends State<AcPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Light Name'),
+          title: const Text('Edit AC Name'),
           content: TextField(
             controller: _acNameController,
             decoration: const InputDecoration(
-              labelText: 'Light Name',
+              labelText: 'AC Name',
               border: OutlineInputBorder(),
             ),
           ),
@@ -97,7 +99,7 @@ class AcPageState extends State<AcPage> {
                   String newName = _acNameController.text;
                   Device updatedDevice = Device(
                     devName: ac.acName,
-                    isOn: ac.isOn, type: 'light', divName: ac.divName, houseName: ac.houseName,
+                    isOn: ac.isOn, type: 'ac', divName: ac.divName, houseName: ac.houseName,
                   );
                   db.updateDeviceName(updatedDevice, newName);
                 });
@@ -119,6 +121,41 @@ class AcPageState extends State<AcPage> {
     // Update the air direction in the database
     //ac.airDirection = newDirection;
     //await db.updateACAirDirection(ac.acName, newDirection);
+  }
+
+  void updateTemp(int newTemp, bool isUp) {
+    if(isUp){
+      setState(() {
+        if (temperature < 30) {
+          temperature++;
+          db.updateTemperature(temperature, ac);
+        }
+      });
+    }else{
+      setState(() {
+        if (temperature > 0){
+          temperature--;
+          db.updateTemperature(temperature, ac);
+        }
+      });
+    }
+  }
+
+  void _turnOnOrOff() async {
+    int newIsOn = (ac.isOn == 1) ? 0 : 1;
+    Device updatedDevice = Device(
+      devName: ac.acName,
+      isOn: newIsOn, type: 'ac', divName: ac.divName, houseName: ac.houseName,
+    );
+    ac = AC(acName: ac.acName, houseName: ac.houseName, divName: ac.divName, isOn: newIsOn, acMode: acMode, acTimer: '', swingModeOn: isSwingMode ? 1 : 0, airDirection: currentAirDirection, acTemp: temperature);
+    print(ac.isOn.toString());
+
+    await db.updateDeviceStatus(updatedDevice, newIsOn);
+
+   setState(() {
+      isOn = newIsOn;
+   });
+
   }
 
   @override
@@ -163,7 +200,8 @@ class AcPageState extends State<AcPage> {
           valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
         ),
       )
-          : Padding(
+          : SingleChildScrollView(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +219,7 @@ class AcPageState extends State<AcPage> {
             const SizedBox(height: 30),
             Center(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     ac.acName,
@@ -209,9 +247,7 @@ class AcPageState extends State<AcPage> {
                     // Upward Triangle Button (Increase Temperature)
                     GestureDetector(
                       onTap: () {
-                        setState(() {
-                          if (temperature < 30) temperature++;
-                        });
+                        updateTemp(temperature, true);
                       },
                       child: SizedBox(
                         width: 50,
@@ -235,9 +271,8 @@ class AcPageState extends State<AcPage> {
                     // Downward Triangle Button (Decrease Temperature)
                     GestureDetector(
                       onTap: () {
-                        setState(() {
-                          if (temperature >= 0) temperature--;
-                        });
+
+                        updateTemp(temperature, false);
                       },
                       child: SizedBox(
                         width: 50,
@@ -300,7 +335,7 @@ class AcPageState extends State<AcPage> {
                           onChanged: (bool value) {
                             setState(() {
                               isSwingMode = value;
-                              // If swing mode is enabled, set angle to full and disable the slider
+
                               if (isSwingMode) {
                                 currentAirDirection = 120; // Set to full range
                               }
@@ -317,45 +352,248 @@ class AcPageState extends State<AcPage> {
             ),
           ),
             const SizedBox(height: 50),
-            // Bottom Buttons: AC Mode and Timer
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Action for setting the AC mode
+                  child: GestureDetector(
+                    onTap: () {
+                      _showModeDialog();
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      backgroundColor: Colors.teal,
-                      textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    child: Card(
+                      color: Colors.teal.shade100,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'AC Mode',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal.shade900,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              acMode, // Display the current mode
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal.shade900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: const Text('AC Mode'),
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 10),
+
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Action for setting the timer
+                  child: GestureDetector(
+                    onTap: () {
+                      _showTimerDialog();
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      backgroundColor: Colors.teal,
-                      textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    child: Card(
+                      color: Colors.teal.shade100,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Timer',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal.shade900,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              timer.isEmpty ? 'No Timer Set' : timer,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal.shade900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: const Text('Set Timer'),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 40),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  _turnOnOrOff();
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(10),
+                  side: BorderSide(
+                    color: isOn == 1 ? Colors.green : Colors.grey,
+                    width: 3,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.power_settings_new,
+                  color: Colors.teal,
+                  size: 50.0,
+                ),
+              ),
+            )
         ]
         ),
       ),
+    ));
+  }
+
+  void _showModeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select AC Mode'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.ac_unit, color: Colors.teal),
+                title: const Text('Cool'),
+                onTap: () {
+                  setState(() {
+                    acMode = 'Cool';
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.local_fire_department, color: Colors.teal),
+                title: const Text('Heat'),
+                onTap: () {
+                  setState(() {
+                    acMode = 'Heat';
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.air, color: Colors.teal),
+                title: const Text('Fan'),
+                onTap: () {
+                  setState(() {
+                    acMode = 'Fan';
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.opacity, color: Colors.teal),
+                title: const Text('Dry'),
+                onTap: () {
+                  setState(() {
+                    acMode = 'Dry';
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
+  void _showTimerDialog() {
+    int? selectedHours = 0;
+    int? selectedMinutes = 0;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Set Timer'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  DropdownButton<int>(
+                    value: selectedHours,
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        selectedHours = newValue!;
+                      });
+                    },
+                    items: List.generate(24, (index) {
+                      return DropdownMenuItem<int>(
+                        value: index,
+                        child: Text('$index hours'),
+                      );
+                    }),
+                  ),
+                  DropdownButton<int>(
+                    value: selectedMinutes,
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        selectedMinutes = newValue!;
+                      });
+                    },
+                    items: List.generate(60, (index) {
+                      return DropdownMenuItem<int>(
+                        value: index,
+                        child: Text('$index minutes'),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  timer = '';
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Delete Timer'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  if (selectedHours == 0 && selectedMinutes == 0) {
+                    timer = 'No Timer Set';
+                  } else {
+                    timer = '${selectedHours ?? 0}h${selectedMinutes ?? 0}m';
+                  }
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Set'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class TrianglePainter extends CustomPainter {

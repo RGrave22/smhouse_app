@@ -2,7 +2,7 @@ class AC {
   final String acName;
   final String houseName;
   final String divName;
-  final int isOn;
+  late final int isOn;
   final String acMode;
   final String acTimer;
   final int swingModeOn;
