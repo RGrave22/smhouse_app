@@ -106,9 +106,9 @@ void _showAddRoomDialog() {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 25, 20, 0),
-                      child: const TextField(
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20, 25, 20, 0),
+                      child: TextField(
                         cursorColor: Color(0xFF153043),
                         decoration: InputDecoration(
                           border: UnderlineInputBorder(),
@@ -142,9 +142,9 @@ void _showAddRoomDialog() {
                     ),
                     const SizedBox(height: 25),
                     const Center(child: Text("OR")),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 25, 20, 0),
-                      child: const TextField(
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20, 25, 20, 0),
+                      child: TextField(
                         cursorColor: Color(0xFF153043),
                         decoration: InputDecoration(
                           border: UnderlineInputBorder(),
