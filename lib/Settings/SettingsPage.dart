@@ -1,61 +1,51 @@
 import 'package:flutter/material.dart';
-import '../../../main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:smhouse_app/HomePage.dart';
+import 'package:smhouse_app/Login/LoginPage.dart';
+import 'package:smhouse_app/Profile/ProfilePage.dart';
 
 /// A page for managing user settings.
-///
-/// This page allows users to modify their settings and perform various actions related to their account.
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  SettingsPage({Key? key}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
+class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderStateMixin {
 
-class _SettingsPageState extends State<SettingsPage> {
-
-  /// Sends a password reset email to the user's email address.
-  /// This method triggers the password reset flow and sends an email to the user's registered email address.
-  /// If the email is successfully sent, a dialog will be displayed to inform the user about the password reset request..
-
-  /// Displays a dialog to inform the user that a password reset email has been sent.
-  /// This method shows an alert dialog to the user indicating that a password reset email has been sent to their registered email address.
-  /// The dialog includes a button for the user to dismiss the dialog.
-  void _showChangePasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Alterar Password'),
-          content: const Text(
-              "Foi enviado para o seu Email o pedido de alteração de password."),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 14, 71, 116),
-              ),
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   /// Builds the settings page UI.
-  ///
-  /// This method constructs the UI for the settings page. It returns a [Scaffold] widget with a [SingleChildScrollView]
-  /// as its body, containing various settings options and actions.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 14, 71, 116),
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.teal),
+          iconSize: 50,
+          onPressed: () {
+            Navigator.pop(
+              context,
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+            icon: const Icon(Icons.account_circle, color: Colors.teal),
+            iconSize: 50,
+          ),
+        ],
+      ),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+     body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -68,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  color: Colors.white,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   borderRadius: BorderRadius.circular(
                       10), // Adjust the border radius as desired
                 ),
@@ -90,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -99,7 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     padding: EdgeInsets.only(left: 16.0),
                     child: Text(
                       'Versão v1.0',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
 
@@ -110,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
 
@@ -120,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     padding: EdgeInsets.only(left: 16.0),
                     child: Text(
                       'Português PT-PT',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     ),
                   ),
 
@@ -131,15 +121,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
 
+
                   ListTile(
                     title: const Text('Poupança de Energia',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                     leading: const Icon(Icons.energy_savings_leaf,
-                        color: Colors.white),
+                        color: Colors.black),
                     onTap: () {
                       //TODO
                     },
@@ -152,11 +143,26 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
 
-                 
+                  ListTile(
+                    title: const Text('Trocar Password',
+                        style: TextStyle(color: Colors.black)),
+                    leading: const Icon(Icons.lock, color: Colors.black),
+                    onTap: () {
+                      //_changePassword(context);
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Sair da Conta',
+                        style: TextStyle(color: Colors.black)),
+                    leading: const Icon(Icons.logout, color: Colors.black),
+                    onTap: () {
+                      
+                    }
+                  ),
                   const SizedBox(height: 24),
                   // Add more settings as desired
                 ],

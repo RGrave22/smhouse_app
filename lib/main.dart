@@ -78,20 +78,17 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   late String username = "";
 
 
-  // Separando as páginas da Bottom Navigation Bar
   final List<Widget> tabBarScreens = [
     const HomePage(),
   ];
 
-  // Controla o estado da Bottom Navigation Bar
   final List<Tab> tabBarItems = const [
     Tab(icon: Icon(FontAwesomeIcons.house, color: Colors.white)),
   ];
 
-  // Separando as páginas e itens do Hamburger Menu
   final List<Widget> hamburgerMenuScreens = [
     const HomePage(),
-    const SettingsPage(),
+    SettingsPage(),
     const ProfilePage(),
   ];
 
@@ -113,7 +110,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Navegação para as páginas da TabBar
   void onTabBarItemTapped(int index) {
     setState(() {
       currentIndex = index;
@@ -121,11 +117,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     });
   }
 
-  /// Navegação para as páginas do Hamburger Menu
   void onHamburgerMenuItemTapped(int index) {
     Navigator.pop(context);
     if (index < tabBarScreens.length) {
-      onTabBarItemTapped(index); // Navega pela TabBar
+      onTabBarItemTapped(index); 
     } else {
       Navigator.push(
         context,
@@ -133,8 +128,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       );
     }
   }
-
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
@@ -177,7 +171,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 ),
               ),
             ),
-            // Itens do Hamburger Menu
             ...hamburgerMenuItems.map((item) {
               return ListTile(
                 leading: FaIcon(item['icon']),
@@ -188,7 +181,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           ],
         ),
       ),
-      body: tabBarScreens.isNotEmpty ? tabBarScreens[currentIndex] : const SizedBox(),
+      body: hamburgerMenuScreens[currentIndex],  // Use the selected page
       bottomNavigationBar: Container(
         height: 42,
         color: const Color.fromARGB(255, 2, 58, 103),
