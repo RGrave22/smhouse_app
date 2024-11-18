@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/AC/ACPage.dart';
 import 'package:smhouse_app/Data/Division.dart';
+import 'package:smhouse_app/VirtualAssist/VirtualAssistPage.dart';
 import 'package:smhouse_app/main.dart';
 
 import '../DB/DB.dart';
@@ -390,7 +391,10 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
               );
               break;
             case 'virtualAssist':
-
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => VirtualAssistPage(vaName: dev.devName)),
+              );
               break;
             default:
 

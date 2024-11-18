@@ -93,6 +93,10 @@ class AcPageState extends State<AcPage> {
     return ac.divName.split(":")[2];
   }
 
+  bool isAcOn(){
+    return isOn == 1;
+  }
+
   void _showEditDialog() {
     _acNameController.text = ac.acName;
     showDialog(
@@ -306,7 +310,9 @@ class AcPageState extends State<AcPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        updateTemp(temperature, true);
+                        if(isAcOn()){
+                          updateTemp(temperature, true);
+                        }
                       },
                       child: SizedBox(
                         width: 50,
@@ -330,8 +336,9 @@ class AcPageState extends State<AcPage> {
                     // Downward Triangle Button (Decrease Temperature)
                     GestureDetector(
                       onTap: () {
-
-                        updateTemp(temperature, false);
+                        if(isAcOn()) {
+                          updateTemp(temperature, false);
+                        }
                       },
                       child: SizedBox(
                         width: 50,
@@ -366,13 +373,15 @@ class AcPageState extends State<AcPage> {
                           handlerSize: 10,
                         ),
                       ),
-                      onChange: isSwingMode
+                      onChange: isSwingMode || !isAcOn()
                           ? null
                           : (value) {
                         // setState(() {
                         //   currentAirDirection = value.toInt();
                         // });
                         updateAirDirection(value.toInt());
+
+
                       },
                       innerWidget: (value) => Center(
                         child: Text(
@@ -394,15 +403,18 @@ class AcPageState extends State<AcPage> {
                           value: isSwingMode,
                           onChanged: (bool value) {
                             setState(() {
-                              isSwingMode = value;
-                              ac.swingModeOn = value ? 1 : 0;
-
+                              if(isAcOn()){
+                                isSwingMode = value;
+                                ac.swingModeOn = value ? 1 : 0;
+                              }
                               //if (isSwingMode) {
                               //  currentAirDirection = 120; // Set to full range
                               //  ac.airDirection = 120;
                               //}
                             });
-                            _updateSwingMode(value);
+                            if(isAcOn()){
+                              _updateSwingMode(value);
+                            }
                           },
                           activeColor: Colors.green,
                         ),
@@ -422,7 +434,9 @@ class AcPageState extends State<AcPage> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      _showModeDialog();
+                      if(isAcOn()){
+                        _showModeDialog();
+                      }
                     },
                     child: Card(
                       color: Colors.teal.shade100,
@@ -459,7 +473,9 @@ class AcPageState extends State<AcPage> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      _showTimerDialog(context);
+                      if(isAcOn()){
+                        _showTimerDialog(context);
+                      }
                     },
                     child: Card(
                       color: Colors.teal.shade100,

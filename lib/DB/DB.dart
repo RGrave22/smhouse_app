@@ -45,7 +45,7 @@ class LocalDB {
       await txn.execute('CREATE TABLE device (devName TEXT PRIMARY KEY, divName TEXT, houseName TEXT, isOn INTEGER, type TEXT)');
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT, intensity INTEGER)');
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acHoursTimer INTEGER, acMinutesTimer INTEGER, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
-      await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarm INTEGER)');
+      await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarmHours INTEGER, alarmMinutes INTEGER)');
       await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
       await txn.execute('CREATE TABLE deviceRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
     });
@@ -78,13 +78,17 @@ class LocalDB {
     Device kitchenMainLightDev = Device(devName: "kitchenMainLight", isOn: 0, type: "light", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
     AC kitchenAC = AC(acName: "kitchenAC", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, acMode: "Cool", acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: 0, airDirection: 0, acTemp: 0);
     Device kitchenACDev = Device(devName: "kitchenAC", isOn: 0, type: "ac", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
+    VirtualAssist kitchenVa = VirtualAssist(vaName: "Alexa", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarmHours: 0, alarmMinutes: 0);
+    Device kitchenVaDev = Device(devName: "Alexa", isOn: 0, type: "virtualAssist", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
 
     await db.insert('light', alexandersLight.toMap());
     await db.insert('light', kitchenMainLight.toMap());
     await db.insert('ac', kitchenAC.toMap());
+    await db.insert('virtualAssist', kitchenVa.toMap());
     await db.insert('device', alexandersLightDev.toMap());
     await db.insert('device', kitchenMainLightDev.toMap());
     await db.insert('device', kitchenACDev.toMap());
+    await db.insert('device', kitchenVaDev.toMap());
 
 
     print('Default users inserted.');
@@ -205,6 +209,21 @@ class LocalDB {
 
     print(result);
     AC ac = result.map((map) => AC.fromMap(map)).toList().first;
+
+    return ac;
+  }
+
+  Future<VirtualAssist> getVa(String vaName) async {
+    final db = await initDB();
+
+    List<Map<String, Object?>> result = await db.query(
+        'virtualAssist',
+        where: 'vaName = ?',
+        whereArgs: [vaName]
+    );
+
+    print(result);
+    VirtualAssist ac = result.map((map) => VirtualAssist.fromMap(map)).toList().first;
 
     return ac;
   }
@@ -398,6 +417,17 @@ class LocalDB {
     });
   }
 
+  Future<void> updateVaVolume(String vaName, int vol) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET volume = ? WHERE vaName = ?',
+        [vol, vaName],
+      );
+    });
+  }
+
   Future<void> updateACAirDirection(String acName, int airDirection) async {
     final db = await initDB();
 
@@ -465,7 +495,7 @@ class LocalDB {
         print("inserted ac");
         break;
       case 'virtualAssist':
-        db.insert("virtualAssist", VirtualAssist(vaName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarm: 0).toMap());
+        db.insert("virtualAssist", VirtualAssist(vaName: device.devName, houseName: device.houseName, divName: device.divName, isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarmHours: 0, alarmMinutes: 0).toMap());
         print("inserted virtual");
         break;
       case 'light':
@@ -509,6 +539,54 @@ class LocalDB {
         [meanTemp.round().toString(), ac.divName],
       );
 
+    });
+  }
+
+  Future<void> updateVaAlarm(String vaName, int alarmHours, int alarmMinutes) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET alarmHours = ? WHERE vaName = ?',
+        [alarmHours, vaName],
+      );
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET alarmMinutes = ? WHERE vaName = ?',
+        [alarmMinutes, vaName],
+      );
+    });
+  }
+
+  Future<void> updateVaMusic(String vaName, String newMusic ) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET music = ? WHERE vaName = ?',
+        [newMusic, vaName],
+      );
+    });
+  }
+
+  Future<void> updateVaPlayingStatus(String vaName, int isPlaying ) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET isPlaying = ? WHERE vaName = ?',
+        [isPlaying, vaName],
+      );
+    });
+  }
+
+  Future<void> updateVaMuteStatus(String vaName, int isMuted ) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE virtualAssist SET isMuted = ? WHERE vaName = ?',
+        [isMuted, vaName],
+      );
     });
   }
 
