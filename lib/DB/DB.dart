@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:smhouse_app/Data/Ac.dart';
 import 'package:smhouse_app/Data/Casa.dart';
 import 'package:smhouse_app/Data/Device.dart';
+import 'package:smhouse_app/Data/DivRestriction.dart';
 import 'package:smhouse_app/Data/Division.dart';
 import 'package:smhouse_app/Data/Light.dart';
 import 'package:smhouse_app/Data/VirtualAssist.dart';
@@ -46,7 +47,7 @@ class LocalDB {
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT, intensity INTEGER)');
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acTimer TEXT, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarm INTEGER)');
-      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
+      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, divName TEXT)');
       await txn.execute('CREATE TABLE deviceRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
     });
 
@@ -453,6 +454,33 @@ class LocalDB {
 
     });
   }
+  //await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, divName TEXT)');
+  Future<void> updateDivRestriction(String divName, String userName, bool isAdding) async{
+    final db = await initDB();
+    DivRestriction dr = new DivRestriction(restrictionName: "$userName:$divName", username: userName, divName: divName);
+    if(isAdding){
+      await db.insert("divRestriction", dr.toMap());
+    }else{
+      await db.delete(
+        "divRestriction",
+        where: "restrictionName = ?",
+        whereArgs: ["$userName:$divName"]
+      );
+    }
+
+
+  }
+
+  Future<List<DivRestriction>> getUserRestrictedDivs(String memberName) async{
+    final db = await initDB();
+    List<Map<String, Object?>> result = await db.query("divRestriction",
+      where: "username = ?",
+      whereArgs: [memberName]
+    );
+
+    List<DivRestriction> dr = result.map((map) => DivRestriction.fromMap(map)).toList();
+    return dr;
+  }
 
   Future<String> getToken() async {
     final db = await initDB();
@@ -637,6 +665,8 @@ class LocalDB {
 
     print('Table users deleted');
   }
+
+
 
 
 

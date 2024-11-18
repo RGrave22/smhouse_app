@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smhouse_app/FamilyMember/FamilyMemberPermissions.dart';
 
 import '../DB/DB.dart';
 import '../Data/User.dart';
@@ -127,7 +128,10 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
                         ),
                         padding: const EdgeInsets.all(20),
                       ),
-                      onPressed: () => {  },
+                      onPressed: () => {
+                        Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => FamilyMemberPermissions(familyMember: widget.familyMember)),
+                      )},
                       child: Text(
                           "${memberName}'s permissions",
                           style: const TextStyle(color: Colors.white)
