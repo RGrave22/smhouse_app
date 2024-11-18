@@ -3,11 +3,12 @@ class AC {
   final String houseName;
   final String divName;
   late final int isOn;
-  final String acMode;
-  final String acTimer;
-  final int swingModeOn;
-  final int airDirection;
-  final int acTemp;
+  late String acMode;
+  late int acHoursTimer;
+  late int acMinutesTimer;
+  late int swingModeOn;
+  late int airDirection;
+  late int acTemp;
 
   AC({
     required this.acName,
@@ -15,7 +16,8 @@ class AC {
     required this.divName,
     required this.isOn,
     required this.acMode,
-    required this.acTimer,
+    required this.acHoursTimer,
+    required this.acMinutesTimer,
     required this.swingModeOn,
     required this.airDirection,
     required this.acTemp,
@@ -28,7 +30,8 @@ class AC {
       'divName': divName,
       'isOn': isOn,
       'acMode': acMode,
-      'acTimer': acTimer,
+      'acHoursTimer': acHoursTimer,
+      'acMinutesTimer': acMinutesTimer,
       'swingModeOn': swingModeOn,
       'airDirection': airDirection,
       'acTemp': acTemp,
@@ -42,7 +45,8 @@ class AC {
       divName: map['divName'],
       isOn: map['isOn'],
       acMode: map['acMode'],
-      acTimer: map['acTimer'],
+      acHoursTimer: map['acHoursTimer'],
+      acMinutesTimer: map['acMinutesTimer'],
       swingModeOn: map['swingModeOn'],
       airDirection: map['airDirection'],
       acTemp: map['acTemp'],
@@ -51,6 +55,6 @@ class AC {
 
   @override
   String toString() {
-    return 'AC(acName: $acName, houseName: $houseName, divName: $divName, isOn: $isOn, acMode: $acMode, acTimer: $acTimer, swingModeOn: $swingModeOn, airDirection: $airDirection, acTemp: $acTemp)';
+    return 'AC(acName: $acName, houseName: $houseName, divName: $divName, isOn: $isOn, acMode: $acMode, acHoursTimer: $acHoursTimer, acMinutesTimer: $acMinutesTimer, swingModeOn: $swingModeOn, airDirection: $airDirection, acTemp: $acTemp)';
   }
 }

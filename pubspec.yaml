@@ -82,6 +82,10 @@ flutter:
     - assets/Lamp_purple.png
     - assets/Lamp_red.png
     - assets/Lamp_yellow.png
+    - assets/High_Hopes.jpg
+    - assets/Learning_to_Fly.jpg
+    - assets/Sultans_of_Swing.jpg
+    - assets/The_Piper's_Call.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

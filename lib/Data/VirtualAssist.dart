@@ -3,11 +3,12 @@ class VirtualAssist {
   final String houseName;
   final String divName;
   final int isOn;
-  final int volume;
-  final int isPlaying;
-  final String music;
-  final int isMuted;
-  final int alarm;
+  late int volume;
+  late int isPlaying;
+  late String music;
+  late int isMuted;
+  late int alarmHours;
+  late int alarmMinutes;
 
   VirtualAssist({
     required this.vaName,
@@ -18,7 +19,8 @@ class VirtualAssist {
     required this.isPlaying,
     required this.music,
     required this.isMuted,
-    required this.alarm,
+    required this.alarmHours,
+    required this.alarmMinutes,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,7 +33,8 @@ class VirtualAssist {
       'isPlaying': isPlaying,
       'music': music,
       'isMuted': isMuted,
-      'alarm': alarm,
+      'alarmHours': alarmHours,
+      'alarmMinutes': alarmMinutes,
     };
   }
 
@@ -45,12 +48,13 @@ class VirtualAssist {
       isPlaying: map['isPlaying'],
       music: map['music'],
       isMuted: map['isMuted'],
-      alarm: map['alarm'],
+      alarmHours: map['alarmHours'],
+      alarmMinutes: map['alarmMinutes'],
     );
   }
 
   @override
   String toString() {
-    return 'VirtualAssist(vaName: $vaName, houseName: $houseName, divName: $divName, isOn: $isOn, volume: $volume, isPlaying: $isPlaying, music: $music, isMuted: $isMuted, alarm: $alarm)';
+    return 'VirtualAssist(vaName: $vaName, houseName: $houseName, divName: $divName, isOn: $isOn, volume: $volume, isPlaying: $isPlaying, music: $music, isMuted: $isMuted, alarmHours: $alarmHours, alarmMinutes: $alarmMinutes)';
   }
 }

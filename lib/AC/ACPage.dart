@@ -33,35 +33,56 @@ class AcPageState extends State<AcPage> {
   late int temperature = 0;
   late bool isSwingMode = false;
   late String acMode = "Cool";
-  late String timer = "";
+  late int hoursTimer = 0;
+  late int minutesTimer = 0;
   late int isOn = 0;
+  late String devName = "";
+
+  int? selectedHours;
+  int? selectedMinutes;
 
   @override
   void initState() {
     getInfo();
+    // setTimers();
     super.initState();
   }
 
-  Future<void> getInfo() async {
+  // void setTimers() {
+  //   selectedHours = hoursTimer;
+  //   selectedMinutes = minutesTimer;
+  // }
+
+  void getInfo() async {
     setState(() {
       isLoading = true;
     });
 
     ac = await db.getAC(widget.acName);
+    print("AC QUE ENTRA NA PAGINA: $ac");
 
     div = await db.getDivision(ac.divName);
 
     currentAirDirection = ac.airDirection;
     temperature = ac.acTemp;
     acMode = ac.acMode;
-    timer = ac.acTimer;
+    hoursTimer = ac.acHoursTimer;
+    minutesTimer = ac.acMinutesTimer;
     isOn = ac.isOn;
-    
-    if(ac.swingModeOn== 1){
-      isSwingMode = true;
+    selectedHours = hoursTimer;
+    selectedMinutes = minutesTimer;
+    isSwingMode = ac.swingModeOn == 1;
+    devName = ac.acName;
+
+    /*if(ac.swingModeOn == 1){
+      print("TAMOS A MUDAR O SWING MODE");
+      setState(() {
+        isSwingMode = ac.swingModeOn == 1;
+      });
+
     }else{
       isSwingMode = false;
-    }
+    }*/
     
     setState(() {
       isLoading = false;
@@ -70,6 +91,10 @@ class AcPageState extends State<AcPage> {
 
   String getDivName() {
     return ac.divName.split(":")[2];
+  }
+
+  bool isAcOn(){
+    return isOn == 1;
   }
 
   void _showEditDialog() {
@@ -102,6 +127,7 @@ class AcPageState extends State<AcPage> {
                     isOn: ac.isOn, type: 'ac', divName: ac.divName, houseName: ac.houseName,
                   );
                   db.updateDeviceName(updatedDevice, newName);
+                  updateDeviceName( _acNameController.text);
                 });
                 Navigator.pop(context);
               },
@@ -113,17 +139,24 @@ class AcPageState extends State<AcPage> {
     );
   }
 
+  void updateDeviceName(String newName) async {
+    setState(() {
+       devName = newName;
+    });
+  }
+
   void updateAirDirection(int newDirection) async {
     setState(() {
       currentAirDirection = newDirection;
     });
 
     // Update the air direction in the database
-    //ac.airDirection = newDirection;
-    //await db.updateACAirDirection(ac.acName, newDirection);
+    ac.airDirection = newDirection;
+    print(ac);
+    await db.updateACAirDirection(ac.acName, newDirection);
   }
 
-  void updateTemp(int newTemp, bool isUp) {
+  void updateTemp(int newTemp, bool isUp) async {
     if(isUp){
       setState(() {
         if (temperature < 30) {
@@ -147,7 +180,7 @@ class AcPageState extends State<AcPage> {
       devName: ac.acName,
       isOn: newIsOn, type: 'ac', divName: ac.divName, houseName: ac.houseName,
     );
-    ac = AC(acName: ac.acName, houseName: ac.houseName, divName: ac.divName, isOn: newIsOn, acMode: acMode, acTimer: '', swingModeOn: isSwingMode ? 1 : 0, airDirection: currentAirDirection, acTemp: temperature);
+    ac = AC(acName: ac.acName, houseName: ac.houseName, divName: ac.divName, isOn: newIsOn, acMode: acMode, acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: isSwingMode ? 1 : 0, airDirection: currentAirDirection, acTemp: temperature);
     print(ac.isOn.toString());
 
     await db.updateDeviceStatus(updatedDevice, newIsOn);
@@ -155,7 +188,38 @@ class AcPageState extends State<AcPage> {
    setState(() {
       isOn = newIsOn;
    });
+  }
 
+  void _updateACMode(String newMode) async {
+    ac.acMode = newMode;
+    print(ac.acMode);
+
+    await db.updateACMode(ac.acName, newMode);
+
+    setState(() {
+      acMode = newMode;
+    });
+  }
+
+  void _updateNewTimer(int hours, int min){
+    setState(() {
+      hoursTimer = hours;
+      minutesTimer = min;
+    });
+  }
+
+  void _updateSwingMode(bool value) async {
+    setState(() {
+      isSwingMode = value;
+      ac.swingModeOn = value ? 1 : 0;
+
+      //if (isSwingMode) {
+      //  currentAirDirection = 120; // Set to full range
+      //  ac.airDirection = 120;
+      //}
+    });
+    print(ac);
+    await db.updateACSwingMode(ac, value);
   }
 
   @override
@@ -222,7 +286,7 @@ class AcPageState extends State<AcPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ac.acName,
+                    devName,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -244,10 +308,11 @@ class AcPageState extends State<AcPage> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Upward Triangle Button (Increase Temperature)
                     GestureDetector(
                       onTap: () {
-                        updateTemp(temperature, true);
+                        if(isAcOn()){
+                          updateTemp(temperature, true);
+                        }
                       },
                       child: SizedBox(
                         width: 50,
@@ -271,8 +336,9 @@ class AcPageState extends State<AcPage> {
                     // Downward Triangle Button (Decrease Temperature)
                     GestureDetector(
                       onTap: () {
-
-                        updateTemp(temperature, false);
+                        if(isAcOn()) {
+                          updateTemp(temperature, false);
+                        }
                       },
                       child: SizedBox(
                         width: 50,
@@ -298,8 +364,8 @@ class AcPageState extends State<AcPage> {
                         startAngle: 105,
                         customColors: CustomSliderColors(
                           trackColor: Colors.grey.shade300,
-                          progressBarColor: Colors.teal,
-                          dotColor: Colors.teal,
+                          progressBarColor: isSwingMode ? Colors.grey : Colors.teal,
+                          dotColor: isSwingMode ? Colors.grey : Colors.teal,
                         ),
                         customWidths: CustomSliderWidths(
                           trackWidth: 5,
@@ -307,12 +373,15 @@ class AcPageState extends State<AcPage> {
                           handlerSize: 10,
                         ),
                       ),
-                      onChange: isSwingMode
+                      onChange: isSwingMode || !isAcOn()
                           ? null
                           : (value) {
-                        setState(() {
-                          currentAirDirection = value.toInt();
-                        });
+                        // setState(() {
+                        //   currentAirDirection = value.toInt();
+                        // });
+                        updateAirDirection(value.toInt());
+
+
                       },
                       innerWidget: (value) => Center(
                         child: Text(
@@ -334,12 +403,18 @@ class AcPageState extends State<AcPage> {
                           value: isSwingMode,
                           onChanged: (bool value) {
                             setState(() {
-                              isSwingMode = value;
-
-                              if (isSwingMode) {
-                                currentAirDirection = 120; // Set to full range
+                              if(isAcOn()){
+                                isSwingMode = value;
+                                ac.swingModeOn = value ? 1 : 0;
                               }
+                              //if (isSwingMode) {
+                              //  currentAirDirection = 120; // Set to full range
+                              //  ac.airDirection = 120;
+                              //}
                             });
+                            if(isAcOn()){
+                              _updateSwingMode(value);
+                            }
                           },
                           activeColor: Colors.green,
                         ),
@@ -359,7 +434,9 @@ class AcPageState extends State<AcPage> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      _showModeDialog();
+                      if(isAcOn()){
+                        _showModeDialog();
+                      }
                     },
                     child: Card(
                       color: Colors.teal.shade100,
@@ -396,7 +473,9 @@ class AcPageState extends State<AcPage> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      _showTimerDialog();
+                      if(isAcOn()){
+                        _showTimerDialog(context);
+                      }
                     },
                     child: Card(
                       color: Colors.teal.shade100,
@@ -415,7 +494,8 @@ class AcPageState extends State<AcPage> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              timer.isEmpty ? 'No Timer Set' : timer,
+
+                              ((hoursTimer == 0) && (minutesTimer == 0)) ? 'No Timer Set' : '${hoursTimer ?? 0}h${minutesTimer ?? 0}m',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -470,9 +550,7 @@ class AcPageState extends State<AcPage> {
                 leading: const Icon(Icons.ac_unit, color: Colors.teal),
                 title: const Text('Cool'),
                 onTap: () {
-                  setState(() {
-                    acMode = 'Cool';
-                  });
+                  _updateACMode('Cool');
                   Navigator.pop(context);
                 },
               ),
@@ -480,9 +558,7 @@ class AcPageState extends State<AcPage> {
                 leading: const Icon(Icons.local_fire_department, color: Colors.teal),
                 title: const Text('Heat'),
                 onTap: () {
-                  setState(() {
-                    acMode = 'Heat';
-                  });
+                  _updateACMode('Heat');
                   Navigator.pop(context);
                 },
               ),
@@ -490,9 +566,7 @@ class AcPageState extends State<AcPage> {
                 leading: const Icon(Icons.air, color: Colors.teal),
                 title: const Text('Fan'),
                 onTap: () {
-                  setState(() {
-                    acMode = 'Fan';
-                  });
+                  _updateACMode('Fan');
                   Navigator.pop(context);
                 },
               ),
@@ -500,9 +574,7 @@ class AcPageState extends State<AcPage> {
                 leading: const Icon(Icons.opacity, color: Colors.teal),
                 title: const Text('Dry'),
                 onTap: () {
-                  setState(() {
-                    acMode = 'Dry';
-                  });
+                  _updateACMode('Dry');
                   Navigator.pop(context);
                 },
               ),
@@ -513,87 +585,113 @@ class AcPageState extends State<AcPage> {
     );
   }
 
-  void _showTimerDialog() {
-    int? selectedHours = 0;
-    int? selectedMinutes = 0;
+  void _showTimerDialog(BuildContext context1) {
+    int currHoursTimer = hoursTimer;
+    int currMinutesTimer = minutesTimer;
+
+    List<DropdownMenuItem<int>> hoursItems = [
+      for (int i = 0; i < 24; i++)
+        DropdownMenuItem<int>(
+          value: i,
+          child: Text('$i hours'),
+        ),
+    ];
+
+    List<DropdownMenuItem<int>> minutesItems = [
+      for (int i = 0; i < 60; i++)
+        DropdownMenuItem<int>(
+          value: i,
+          child: Text('$i minutes'),
+        ),
+    ];
 
     showDialog(
-      context: context,
+      context: context1,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Set Timer'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Set Timer'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  DropdownButton<int>(
-                    value: selectedHours,
-                    onChanged: (int? newValue) {
-                      setState(() {
-                        selectedHours = newValue!;
-                      });
-                    },
-                    items: List.generate(24, (index) {
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text('$index hours'),
-                      );
-                    }),
-                  ),
-                  DropdownButton<int>(
-                    value: selectedMinutes,
-                    onChanged: (int? newValue) {
-                      setState(() {
-                        selectedMinutes = newValue!;
-                      });
-                    },
-                    items: List.generate(60, (index) {
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text('$index minutes'),
-                      );
-                    }),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      DropdownButton<int>(
+                        value: currHoursTimer,
+                        items: hoursItems,
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            currHoursTimer = newValue ?? 0;
+                            print('Selected Hours: $currHoursTimer');
+                          });
+                        },
+                      ),
+                      DropdownButton<int>(
+                        value: currMinutesTimer,
+                        items: minutesItems,
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            currMinutesTimer = newValue ?? 0;
+                            print('Selected Minutes: $currMinutesTimer');
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  timer = '';
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Delete Timer'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  if (selectedHours == 0 && selectedMinutes == 0) {
-                    timer = 'No Timer Set';
-                  } else {
-                    timer = '${selectedHours ?? 0}h${selectedMinutes ?? 0}m';
-                  }
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Set'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      //currHoursTimer = 0;
+                      //currMinutesTimer = 0;
+                      ac.acHoursTimer = 0;
+                      ac.acMinutesTimer = 0;
+                      hoursTimer = 0;
+                      minutesTimer = 0;
+                    });
+                    _updateNewTimer(0,0);
+                    db.updateACTimer(ac.acName, ac.acHoursTimer, ac.acMinutesTimer);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Delete Timer'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    print(currHoursTimer);
+                    setState(() {
+                      ac.acHoursTimer = currHoursTimer;
+                      ac.acMinutesTimer = currMinutesTimer;
+                      //selectedHours = currHoursTimer;
+                      //selectedMinutes = currMinutesTimer;
+                      hoursTimer = currHoursTimer;
+                      minutesTimer = currMinutesTimer;
+                    });
+                    _updateNewTimer(currHoursTimer,currMinutesTimer);
+                    print('Timer Set: ${ac.acHoursTimer} hours, ${ac.acMinutesTimer} minutes');
+                    db.updateACTimer(ac.acName, ac.acHoursTimer, ac.acMinutesTimer);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Set'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
+
+
 }
 
 class TrianglePainter extends CustomPainter {
