@@ -425,8 +425,12 @@ class LocalDB {
 
     await db.transaction((txn) async {
       await txn.rawUpdate(
-        'UPDATE ac SET acHoursTimer = ? and acMinutesTimer = ? WHERE acName = ?',
-        [acHoursTimer, acMinutesTimer, acName],
+        'UPDATE ac SET acHoursTimer = ? WHERE acName = ?',
+        [acHoursTimer, acName],
+      );
+      await txn.rawUpdate(
+        'UPDATE ac SET acMinutesTimer = ? WHERE acName = ?',
+        [acMinutesTimer, acName],
       );
     });
   }
@@ -439,13 +443,13 @@ class LocalDB {
     await db.transaction((txn) async {
       if (swingMode) {
         await txn.rawUpdate(
-          'UPDATE ac SET swingModeOn = ? and airDirection = ? WHERE acName = ?',
-          [newMode, 120, ac.acName],
+          'UPDATE ac SET swingModeOn = ? WHERE acName = ?',
+          [newMode, ac.acName],
         );
       } else {
         await txn.rawUpdate(
-          'UPDATE ac SET swingModeOn = ? and airDirection = ? WHERE acName = ?',
-          [newMode, ac.airDirection, ac.acName],
+          'UPDATE ac SET swingModeOn = ? WHERE acName = ?',
+          [newMode, ac.acName],
         );
       }
     });
@@ -483,7 +487,7 @@ class LocalDB {
       );
 
       final List<Map<String, dynamic>> acList = await txn.rawQuery(
-        'SELECT acTemp FROM ac WHERE divName = ?',
+        'SELECT acTemp FROM ac WHERE divName = ? AND isOn = 1',
         [ac.divName],
       );
 
