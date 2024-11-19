@@ -68,7 +68,7 @@ class LocalDB {
     Casa usersHouse = Casa(houseName: 'user1:UsersHouse', houseTemp: "16", houseOn: 0);
     await db.insert('casa', usersHouse.toMap());
 
-    Division kitchen = Division(divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse", divON: 0, divTemp: "16");
+    Division kitchen = Division(divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse", divON: 0, divTemp: "20");
     Division alexandersBedroom = Division(divName: "user1:UsersHouse:alexandersBedroom", houseName: "user1:UsersHouse", divON: 0, divTemp: "16");
     await db.insert('division', kitchen.toMap());
     await db.insert('division', alexandersBedroom.toMap());

@@ -68,7 +68,103 @@ class _HomePageState extends State<HomePage> {
     return devicesOn.toString();
   }
 
-  // Método para exibir o popup de seleção de tipo de sala
+void _showHouseTempPopup() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'House Temperature',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.teal),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  const Divider(color: Colors.grey),
+                  const SizedBox(height: 10),
+                  for (Division room in rooms)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                _getRoomIcon(getDivName(room.divName)),
+                                color: Colors.teal,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                getDivName(room.divName),
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            "${room.divTemp}º",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+IconData _getRoomIcon(String roomName) {
+  switch (roomName.toLowerCase()) {
+    case "kitchen":
+      return Icons.kitchen;
+    case "bedroom":
+      return Icons.bed;
+    case "garage":
+      return Icons.garage;
+    case "office":
+      return Icons.computer;
+    case "living room":
+      return Icons.tv_rounded;
+    default:
+      return Icons.home;
+  }
+}
+
+
+
   void _showAddRoomDialog() {
     showDialog(
       context: context,
@@ -282,9 +378,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildWeatherInfo(String label, String value) {
-    IconData icon = label == "Weather" ? Icons.wb_sunny : Icons.thermostat;
+  IconData icon = label == "Weather" ? Icons.wb_sunny : Icons.thermostat;
 
-    return Column(
+  return GestureDetector(
+    onTap: () {
+      if (label == "House Temp") {
+        _showHouseTempPopup();
+      }
+    },
+    child: Column(
       children: [
         Text(
           label,
@@ -303,8 +405,10 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ],
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildRoomCard(BuildContext  context, String roomName, Future<String> devicesOnFuture) {
     return Card(
