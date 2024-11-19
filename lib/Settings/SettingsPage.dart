@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/HomePage.dart';
 import 'package:smhouse_app/Login/LoginPage.dart';
 import 'package:smhouse_app/Profile/ProfilePage.dart';
+import 'package:smhouse_app/Register/RegisterPage.dart';
+import 'package:smhouse_app/main.dart';
 
 /// A page for managing user settings.
 class SettingsPage extends StatefulWidget {
@@ -76,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Geral',
+                    'General',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -88,7 +90,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   const Padding(
                     padding: EdgeInsets.only(left: 16.0),
                     child: Text(
-                      'Versão v1.0',
+                      'Version v1.0',
                       style: TextStyle(color: Colors.black),
                     ),
                   ),
@@ -96,7 +98,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   const SizedBox(height: 24),
 
                   const Text(
-                    'Idioma',
+                    'Language',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -109,7 +111,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   const Padding(
                     padding: EdgeInsets.only(left: 16.0),
                     child: Text(
-                      'Português PT-PT',
+                      'English',
                       style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     ),
                   ),
@@ -117,7 +119,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   const SizedBox(height: 24),
 
                   const Text(
-                    'Definições Gerais',
+                    'General Settings',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -127,7 +129,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
 
 
                   ListTile(
-                    title: const Text('Poupança de Energia',
+                    title: const Text('Power Save Options',
                         style: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                     leading: const Icon(Icons.energy_savings_leaf,
                         color: Colors.black),
@@ -139,7 +141,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   const SizedBox(height: 24),
 
                   const Text(
-                    'Definições de Conta',
+                    'Acoount Settings',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -148,7 +150,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   ),
 
                   ListTile(
-                    title: const Text('Trocar Password',
+                    title: const Text('Change Password',
                         style: TextStyle(color: Colors.black)),
                     leading: const Icon(Icons.lock, color: Colors.black),
                     onTap: () {
@@ -156,11 +158,14 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                     },
                   ),
                   ListTile(
-                    title: const Text('Sair da Conta',
+                    title: const Text('Leave Account',
                         style: TextStyle(color: Colors.black)),
                     leading: const Icon(Icons.logout, color: Colors.black),
                     onTap: () {
-                      
+                       Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MyApp()),
+              );
                     }
                   ),
                   const SizedBox(height: 24),
