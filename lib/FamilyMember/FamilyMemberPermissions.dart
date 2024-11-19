@@ -76,7 +76,6 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
       await updateRestrictedDivsList();
 
       setState(() {});
-
   }
 
 

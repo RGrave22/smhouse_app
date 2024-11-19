@@ -47,7 +47,7 @@ class LocalDB {
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT, intensity INTEGER)');
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acHoursTimer INTEGER, acMinutesTimer INTEGER, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarmHours INTEGER, alarmMinutes INTEGER)');
-      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
+      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, divName TEXT, username TEXT, hours TEXT)');
       await txn.execute('CREATE TABLE deviceRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
     });
 
@@ -589,6 +589,8 @@ class LocalDB {
         [isMuted, vaName],
       );
     });
+  }
+
   //await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, divName TEXT)');
   Future<void> updateDivRestriction(String divName, String userName, bool isAdding) async{
     final db = await initDB();
@@ -616,7 +618,7 @@ class LocalDB {
     List<DivRestriction> dr = result.map((map) => DivRestriction.fromMap(map)).toList();
     return dr;
   }
-  }
+
 
   Future<String> getToken() async {
     final db = await initDB();
