@@ -4,6 +4,7 @@ import 'package:smhouse_app/HomePage.dart';
 import 'package:smhouse_app/Login/LoginPage.dart';
 import 'package:smhouse_app/Profile/ProfilePage.dart';
 import 'package:smhouse_app/Register/RegisterPage.dart';
+import 'package:smhouse_app/main.dart';
 
 /// A page for managing user settings.
 class SettingsPage extends StatefulWidget {
@@ -163,7 +164,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                     onTap: () {
                        Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                MaterialPageRoute(builder: (context) => const MyApp()),
               );
                     }
                   ),

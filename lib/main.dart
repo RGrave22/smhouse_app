@@ -91,14 +91,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     const HomePage(),
     SettingsPage(),
     const ProfilePage(),
-    const AboutUsPage()
+    const AboutUsPage(),
+    const MyApp()
   ];
 
   final List<Map<String, dynamic>> hamburgerMenuItems = [
     {'icon': FontAwesomeIcons.house, 'title': 'Menu Principal', 'index': 0},
-    {'icon': FontAwesomeIcons.gear, 'title': 'Settings', 'index': 1},
-    {'icon': FontAwesomeIcons.user, 'title': 'Profile', 'index': 2},
-    {'icon': FontAwesomeIcons.circleInfo, 'title': 'About Us', 'index': 3},
+    {'icon': FontAwesomeIcons.user, 'title': 'Profile', 'index': 1},
+        {'icon': FontAwesomeIcons.circleInfo, 'title': 'About Us', 'index': 2},
+    {'icon': FontAwesomeIcons.gear, 'title': 'Settings', 'index': 3},
+    {'icon': Icons.logout, 'title': 'LogOut ', 'index': 4},
 
   ];
 
