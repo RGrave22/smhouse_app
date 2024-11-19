@@ -12,7 +12,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -21,50 +20,49 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.lightGreen,
-          textSelectionTheme: const TextSelectionThemeData(cursorColor: Colors.black),
+          textSelectionTheme:
+              const TextSelectionThemeData(cursorColor: Colors.black),
           textTheme: const TextTheme(
             titleMedium: TextStyle(color: Colors.black),
           ),
           inputDecorationTheme: InputDecorationTheme(
             hintStyle: TextStyle(color: Colors.black.withOpacity(0.7)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             border: const OutlineInputBorder(borderSide: BorderSide.none),
           ),
         ),
         home: Scaffold(
-            backgroundColor:  Colors.white,
+            backgroundColor: Colors.white,
             body: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
-                      child: Image.asset(
-                        'assets/Logo_init.jpeg',
-                        width: 300,
-                        height: 200,
-                      ),
-                    ),
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 70),
-                        alignment: Alignment.center,
-                        width: 350.0,
-                        height: 550.0,
-                        child: LoginScreen(),
-                      ),
-                    ),
-                  ],
-                )
-            )
-        ));
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+                  child: Image.asset(
+                    'assets/Logo_init.jpeg',
+                    width: 300,
+                    height: 200,
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 70),
+                    alignment: Alignment.center,
+                    width: 350.0,
+                    height: 550.0,
+                    child: LoginScreen(),
+                  ),
+                ),
+              ],
+            ))));
   }
 }
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
-  
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -74,10 +72,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
   int currentIndex = 0;
-  
+
   final _navigatorKey = GlobalKey<NavigatorState>();
   late String username = "";
-
 
   final List<Widget> tabBarScreens = [
     const HomePage(),
@@ -89,19 +86,18 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   final List<Widget> hamburgerMenuScreens = [
     const HomePage(),
-    SettingsPage(),
     const ProfilePage(),
     const AboutUsPage(),
+    SettingsPage(),
     const MyApp()
   ];
 
   final List<Map<String, dynamic>> hamburgerMenuItems = [
     {'icon': FontAwesomeIcons.house, 'title': 'Menu Principal', 'index': 0},
     {'icon': FontAwesomeIcons.user, 'title': 'Profile', 'index': 1},
-        {'icon': FontAwesomeIcons.circleInfo, 'title': 'About Us', 'index': 2},
+    {'icon': FontAwesomeIcons.circleInfo, 'title': 'About Us', 'index': 2},
     {'icon': FontAwesomeIcons.gear, 'title': 'Settings', 'index': 3},
     {'icon': Icons.logout, 'title': 'LogOut ', 'index': 4},
-
   ];
 
   @override
@@ -126,7 +122,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void onHamburgerMenuItemTapped(int index) {
     Navigator.pop(context);
     if (index < tabBarScreens.length) {
-      onTabBarItemTapped(index); 
+      onTabBarItemTapped(index);
     } else {
       Navigator.push(
         context,
@@ -134,7 +130,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       );
     }
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
@@ -173,7 +170,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 child: FractionallySizedBox(
                   widthFactor: 0.9,
                   heightFactor: 0.9,
-                  child: Image.asset('assets/Logo_init.jpeg', fit: BoxFit.contain),
+                  child:
+                      Image.asset('assets/Logo_init.jpeg', fit: BoxFit.contain),
                 ),
               ),
             ),
@@ -187,16 +185,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           ],
         ),
       ),
-      body: hamburgerMenuScreens[currentIndex],  // Use the selected page
-      bottomNavigationBar: Container(
-        height: 42,
-        color: const Color.fromARGB(255, 2, 58, 103),
-        child: TabBar(
-          controller: _tabController,
-          onTap: (index) => onTabBarItemTapped(index),
-          tabs: tabBarItems,
-        ),
-      ),
+      body: hamburgerMenuScreens[currentIndex], // Use the selected page
+      // bottomNavigationBar: Container(
+      //   height: 42,
+      //   color: const Color.fromARGB(255, 2, 58, 103),
+      //   child: TabBar(
+      //     controller: _tabController,
+      //     onTap: (index) => onTabBarItemTapped(index),
+      //     tabs: tabBarItems,
+      //   ),
+      // ),
     );
   }
 }

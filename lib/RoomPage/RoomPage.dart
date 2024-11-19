@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,8 +21,7 @@ class RoomPage extends StatefulWidget {
   State<RoomPage> createState() => _RoomPageState();
 }
 
-
-class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
+class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _roomNameController = TextEditingController();
   final LocalDB db = LocalDB('SmHouse');
@@ -32,8 +30,6 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
 
   late Division div;
   List<Device> devices = [];
-
-
 
   @override
   void initState() {
@@ -54,10 +50,8 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
     });
   }
 
-  bool isDeviceOn(String devName){
-    Device? device = devices.firstWhere(
-          (device) => device.devName == devName
-    );
+  bool isDeviceOn(String devName) {
+    Device? device = devices.firstWhere((device) => device.devName == devName);
 
     return device.isOn == 1;
   }
@@ -68,7 +62,10 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
 
       Device updatedDevice = Device(
         devName: device.devName,
-        isOn: value ? 1 : 0, type: device.type, divName: device.divName, houseName: device.houseName,
+        isOn: value ? 1 : 0,
+        type: device.type,
+        divName: device.divName,
+        houseName: device.houseName,
       );
 
       int index = devices.indexOf(device);
@@ -79,33 +76,26 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
     });
   }
 
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        key: _scaffoldKey,
+    return Scaffold(
         appBar: AppBar(
-          elevation: 0,
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          elevation: 0,
           leading: IconButton(
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
-            },
-            icon: const Icon(Icons.menu, color: Colors.teal),
+            icon: const Icon(Icons.arrow_back, color: Colors.teal),
             iconSize: 50,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MainPage()));
+            },
           ),
           actions: [
             IconButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
               },
               icon: const Icon(Icons.account_circle, color: Colors.teal),
@@ -113,185 +103,77 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
             ),
           ],
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Colors.white,
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
                 ),
-                child: Center(
-                  child: FractionallySizedBox(
-                    widthFactor: 0.9,
-                    heightFactor: 0.9,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
+              )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50.0),
+                      child: Column(
+                        children: [
+                          const CircleAvatar(
+                            radius: 50,
+                            backgroundImage:
+                                AssetImage('assets/Logo_init.jpeg'),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                div.divName.split(":")[2],
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: _showEditDialog,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Image.asset(
-                          'assets/Logo_init.jpeg',
-                          fit: BoxFit.contain,
+                    ),
+                    Expanded(
+                      child: ListView(
+                        children: devices
+                            .map((dev) => _buildDeviceCard(
+                                context,
+                                dev,
+                                isDeviceOn(dev.devName),
+                                (value) =>
+                                    _onDeviceSwitchChanged(dev.devName, value)))
+                            .toList(),
+                      ),
+                    ),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _showAddRoomDialog,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(20),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 30,
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
-              ),
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.house),
-                title: const Text('Menu Principal'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => const MainPage()
-                      )
-                  );
-                },
-              ),
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.map),
-                title: const Text('Mapa'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.userGroup),
-                title: const Text('Grupos'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.chalkboardUser),
-                title: const Text('Tutores'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.newspaper),
-                title: const Text('Noticias'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.searchengin),
-                title: const Text('Perdidos e Achados'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.utensils),
-                title: const Text('Refeitorio'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.circleInfo),
-                title: const Text('Sobre Nós'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const FaIcon(FontAwesomeIcons.gear),
-                title: const Text('Definições'),
-                onTap: () {
-
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        ),
-      backgroundColor: Colors.white,
-      body: isLoading
-          ? const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
-        ),
-      )
-          :Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-        Padding(
-        padding: const EdgeInsets.only(top: 50.0),
-        child: Column(
-          children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/Logo_init.jpeg'), 
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  div.divName.split(":")[2], 
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: _showEditDialog, 
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-
-          Expanded(
-            child: ListView(
-              children: devices
-                  .map((dev) => _buildDeviceCard(context, dev, isDeviceOn(dev.devName), (value) => _onDeviceSwitchChanged(dev.devName, value)))
-                  .toList(),
-            ),
-          ),
-
-        Center(
-              child: ElevatedButton(
-                onPressed: _showAddRoomDialog, 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(20),
-                ),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-          
-        ],
-      ),
-    ));
+              ));
   }
 
   void _showEditDialog() {
@@ -319,7 +201,8 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
               onPressed: () {
                 setState(() {
                   List<String> name = div.divName.split(":");
-                  String newName = "${name[0]}:${name[1]}:${_roomNameController.text}";
+                  String newName =
+                      "${name[0]}:${name[1]}:${_roomNameController.text}";
                   db.updateDivName(newName, div.divName);
 
                   div = Division(
@@ -339,7 +222,8 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
     );
   }
 
-  Widget _buildDeviceCard(BuildContext context, Device dev, bool isDeviceOn, ValueChanged<bool> onChanged) {
+  Widget _buildDeviceCard(BuildContext context, Device dev, bool isDeviceOn,
+      ValueChanged<bool> onChanged) {
     IconData deviceIcon;
     switch (dev.type) {
       case 'light':
@@ -381,26 +265,28 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
             case 'light':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LightPage(lightName: dev.devName)),
+                MaterialPageRoute(
+                    builder: (context) => LightPage(lightName: dev.devName)),
               );
               break;
             case 'ac':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AcPage(acName: dev.devName)),
+                MaterialPageRoute(
+                    builder: (context) => AcPage(acName: dev.devName)),
               );
               break;
             case 'virtualAssist':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => VirtualAssistPage(vaName: dev.devName)),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        VirtualAssistPage(vaName: dev.devName)),
               );
               break;
             default:
-
               break;
           }
-
         },
       ),
     );
@@ -532,8 +418,12 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-
-                    Device device = Device(devName: _devNameController.text, isOn: 0, type: deviceType, divName: div.divName, houseName: div.houseName);
+                    Device device = Device(
+                        devName: _devNameController.text,
+                        isOn: 0,
+                        type: deviceType,
+                        divName: div.divName,
+                        houseName: div.houseName);
                     Navigator.of(context).pop();
                     setState(() {
                       devices.add(device);
@@ -561,5 +451,4 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin{
       },
     );
   }
-
 }
