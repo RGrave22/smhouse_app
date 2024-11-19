@@ -178,11 +178,9 @@ IconData _getRoomIcon(String roomName) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header com texto centralizado e botão de fechar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Texto "Add Room"
                     const Expanded(
                       child: Center(
                         child: Text(
@@ -194,11 +192,10 @@ IconData _getRoomIcon(String roomName) {
                         ),
                       ),
                     ),
-                    // Botão de fechar
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.teal),
                       onPressed: () {
-                        Navigator.of(context).pop(); // Fecha o popup
+                        Navigator.of(context).pop(); 
                       },
                     ),
                   ],

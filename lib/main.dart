@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smhouse_app/AboutUs/AboutUsPage.dart';
 import 'package:smhouse_app/HomePage.dart';
 import 'package:smhouse_app/Login/LoginPage.dart';
 import 'package:smhouse_app/Settings/SettingsPage.dart';
@@ -90,12 +91,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     const HomePage(),
     SettingsPage(),
     const ProfilePage(),
+    const AboutUsPage()
   ];
 
   final List<Map<String, dynamic>> hamburgerMenuItems = [
     {'icon': FontAwesomeIcons.house, 'title': 'Menu Principal', 'index': 0},
     {'icon': FontAwesomeIcons.gear, 'title': 'Settings', 'index': 1},
     {'icon': FontAwesomeIcons.user, 'title': 'Profile', 'index': 2},
+    {'icon': FontAwesomeIcons.circleInfo, 'title': 'About Us', 'index': 3},
+
   ];
 
   @override
