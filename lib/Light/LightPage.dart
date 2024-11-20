@@ -113,61 +113,6 @@ class _LightPageState extends State<LightPage> {
 
   }
 
-
-  // void _showEditLightDialog(String roomType) {
-  //   TextEditingController _lightNameController = TextEditingController();
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Dialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(20),
-  //         ),
-  //         child: Padding(
-  //           padding: const EdgeInsets.all(16.0),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.center,
-  //                 children: [
-  //                   Expanded(
-  //                     child: Center(
-  //                       child: Text(
-  //                         'Edit Room - $roomType',
-  //                         style: const TextStyle(
-  //                           fontSize: 20,
-  //                           fontWeight: FontWeight.bold,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   IconButton(
-  //                     icon: const Icon(Icons.close, color: Colors.teal),
-  //                     onPressed: () {
-  //                       Navigator.of(context).pop();
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //               const SizedBox(height: 10),
-  //               TextField(
-  //                 controller: _lightNameController,
-  //                 decoration: const InputDecoration(
-  //                   labelText: 'Device Name',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 20),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   void _showEditDialog() {
     _lightNameController.text = light.lightName;
     showDialog(
