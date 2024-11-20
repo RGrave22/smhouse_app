@@ -11,6 +11,7 @@ import 'package:smhouse_app/Data/Light.dart';
 import 'package:smhouse_app/Data/VirtualAssist.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../Data/DevRestriction.dart';
 import '../Data/User.dart';
 
 
@@ -47,8 +48,8 @@ class LocalDB {
       await txn.execute('CREATE TABLE light (lightName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, color TEXT, intensity INTEGER)');
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acHoursTimer INTEGER, acMinutesTimer INTEGER, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarmHours INTEGER, alarmMinutes INTEGER)');
-      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, divName TEXT,  username TEXT, hours TEXT)');
-      await txn.execute('CREATE TABLE deviceRestriction (restrictionName TEXT PRIMARY KEY, username TEXT, hours TEXT)');
+      await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, divName TEXT,  username TEXT)');
+      await txn.execute('CREATE TABLE devRestriction (restrictionName TEXT PRIMARY KEY, deviceName TEXT, username TEXT, startingTime TEXT, endTime TEXT)');
     });
 
   }
@@ -616,6 +617,33 @@ class LocalDB {
     );
 
     List<DivRestriction> dr = result.map((map) => DivRestriction.fromMap(map)).toList();
+    return dr;
+  }
+
+  //      await txn.execute('CREATE TABLE devRestriction (restrictionName TEXT PRIMARY KEY, deviceName TEXT, username TEXT, startingTime TEXT, endTime TEXT)');
+  Future<void> updateDevRestriction(String devName, String userName, String startTime, String endTime, bool isAdding) async{
+    final db = await initDB();
+    DevRestriction dr = new DevRestriction(restrictionName: "$userName:$devName", deviceName: devName, username: userName, startingTime: startTime, endTime: endTime);
+
+    if(isAdding){
+      await db.insert("devRestriction", dr.toMap());
+    }else{
+      await db.delete(
+          "devRestriction",
+          where: "restrictionName = ?",
+          whereArgs: ["$userName:$devName"]
+      );
+    }
+  }
+
+  Future<List<DevRestriction>> getUserRestrictedDevs(String memberName) async{
+    final db = await initDB();
+    List<Map<String, Object?>> result = await db.query("devRestriction",
+        where: "username = ?",
+        whereArgs: [memberName]
+    );
+
+    List<DevRestriction> dr = result.map((map) => DevRestriction.fromMap(map)).toList();
     return dr;
   }
 

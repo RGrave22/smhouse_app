@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smhouse_app/AboutUs/AboutUsPage.dart';
 import 'package:smhouse_app/HomePage.dart';
 import 'package:smhouse_app/Login/LoginPage.dart';
@@ -7,7 +8,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/Profile/ProfilePage.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // Allow only portrait mode
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
