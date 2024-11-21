@@ -714,7 +714,7 @@ class LocalDB {
     final db = await initDB();
 
     db.rawUpdate(
-      'UPDATE user SET houseName = ? WHERE userName = ?',
+      'UPDATE users SET casa = ? WHERE username = ?',
       [houseName, userName],
     );
   }
@@ -723,7 +723,7 @@ class LocalDB {
     final db = await initDB();
 
     db.rawUpdate(
-      'UPDATE user SET houseName = ? WHERE email = ?',
+      'UPDATE users SET casa = ? WHERE email = ?',
       [houseName, email],
     );
   }

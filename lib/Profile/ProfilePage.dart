@@ -72,8 +72,6 @@ class _ProfilePage extends State<ProfilePage> {
   }
 
 void _showAddMemberDialog() {
-  usernameController.text = generateRandomString();
-  emailController.text = generateRandomString();
   familyCodeController.text = generateRandomString();
   _obscureText = true;
   showDialog(
@@ -114,11 +112,12 @@ void _showAddMemberDialog() {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(20, 25, 20, 0),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 25, 20, 0),
                       child: TextField(
-                        cursorColor: Color(0xFF153043),
-                        decoration: InputDecoration(
+                        controller: emailController,
+                        cursorColor: const Color(0xFF153043),
+                        decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
                           labelText: 'Email',
                           focusedBorder: UnderlineInputBorder(
@@ -135,9 +134,12 @@ void _showAddMemberDialog() {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          db.addUserToFamilyWithEmail(emailController.text, houseName);
+                          db.addUserToFamilyWithEmail(emailController.text, user.casa);
                         });
                         Navigator.of(context).pop();
+                        Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => ProfilePage()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
@@ -153,11 +155,12 @@ void _showAddMemberDialog() {
                     ),
                     const SizedBox(height: 25),
                     const Center(child: Text("OR")),
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(20, 25, 20, 0),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 25, 20, 0),
                       child: TextField(
-                        cursorColor: Color(0xFF153043),
-                        decoration: InputDecoration(
+                        controller: usernameController,
+                        cursorColor: const Color(0xFF153043),
+                        decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
                           labelText: 'Username',
                           focusedBorder: UnderlineInputBorder(
@@ -174,10 +177,12 @@ void _showAddMemberDialog() {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          db.addUserToFamilyWithUserName(usernameController.text, houseName);
+                          db.addUserToFamilyWithUserName(usernameController.text, user.casa);
                         });
                         Navigator.of(context).pop();
-                        addUserToHouse();
+                        Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => ProfilePage()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
