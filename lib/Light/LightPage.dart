@@ -26,7 +26,7 @@ class LightPage extends StatefulWidget {
   State<LightPage> createState() => _LightPageState();
 }
 
-//TODO: Add capacity to change room name
+
 class _LightPageState extends State<LightPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _lightNameController = TextEditingController();
@@ -203,8 +203,9 @@ class _LightPageState extends State<LightPage> {
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
         ),
-      )
-          : Padding(
+      ) : SingleChildScrollView(
+          child:
+           Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,29 +235,43 @@ class _LightPageState extends State<LightPage> {
             ),
             const SizedBox(height: 20),
             Center(
-              child: SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  activeTrackColor:  Colors.teal,
-                  inactiveTrackColor: Colors.teal.withOpacity(0.3),
-                  thumbColor: Colors.teal,
-                  overlayColor: Colors.teal.withOpacity(0.2),
-                  trackHeight: 4.0,
-                  valueIndicatorColor: Colors.teal,
-                  valueIndicatorTextStyle: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  const Icon(
+                    Icons.light_mode,
+                    size: 30.0,
+                    color: Colors.teal,
                   ),
-                ),
-                child: Slider(
-                  value: currentIntensity,
-                  min: 0,
-                  max: 100,
-                  divisions: 10,
-                  label: '${currentIntensity.toInt()}',
-                  onChanged: (value) {
-                    _updateIntensity(value);
-                  },
-                ),
+                  const SizedBox(width: 10),
+                    Expanded(child:
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor:  Colors.teal,
+                        inactiveTrackColor: Colors.teal.withOpacity(0.3),
+                        thumbColor: Colors.teal,
+                        overlayColor: Colors.teal.withOpacity(0.2),
+                        trackHeight: 4.0,
+                        valueIndicatorColor: Colors.teal,
+                        valueIndicatorTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: Slider(
+                        value: currentIntensity,
+                        min: 0,
+                        max: 100,
+                        divisions: 10,
+                        label: '${currentIntensity.toInt()}',
+                        onChanged: (value) {
+                          if(light.isOn != 0) {
+                            _updateIntensity(value);
+                          }
+                        },
+                      ),
+                    ),),
+                ],
               ),
             ),
             (light.isOn != 0)
@@ -345,7 +360,7 @@ class _LightPageState extends State<LightPage> {
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(10),
                   side: BorderSide(
-                    color: light.isOn == 1 ? Colors.green : Colors.grey, // Green if AC is ON, grey if OFF
+                    color: light.isOn == 1 ? Colors.green : Colors.red, // Green if AC is ON, grey if OFF
                     width: 3, // You can adjust the width as needed
                   ),
                 ),
@@ -359,7 +374,7 @@ class _LightPageState extends State<LightPage> {
             // const SizedBox(height: 20),
           ],
         ),
-      ),
+      )),
       backgroundColor: Colors.white,
     );
   }

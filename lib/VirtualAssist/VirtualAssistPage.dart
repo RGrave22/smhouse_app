@@ -133,11 +133,11 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit AC Name'),
+          title: const Text('Edit V.Assistant Name'),
           content: TextField(
             controller: _vaNameController,
             decoration: const InputDecoration(
-              labelText: 'AC Name',
+              labelText: 'V.Assistant Name',
               border: OutlineInputBorder(),
             ),
           ),
@@ -479,7 +479,7 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
                         shape: const CircleBorder(),
                         padding: const EdgeInsets.all(10),
                         side: BorderSide(
-                          color: isOn == 1 ? Colors.green : Colors.grey,
+                          color: isOn == 1 ? Colors.green : Colors.red,
                           width: 3,
                         ),
                       ),

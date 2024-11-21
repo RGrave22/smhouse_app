@@ -534,7 +534,7 @@ class AcPageState extends State<AcPage> {
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(10),
                   side: BorderSide(
-                    color: isOn == 1 ? Colors.green : Colors.grey,
+                    color: isOn == 1 ? Colors.green : Colors.red,
                     width: 3,
                   ),
                 ),
