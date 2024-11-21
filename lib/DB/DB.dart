@@ -297,7 +297,6 @@ class LocalDB {
     return division;
   }
 
-
   Future<void> updateDeviceName(Device dev, String newName) async {
     final db = await initDB();
     String devName =  dev.devName;
@@ -332,7 +331,6 @@ class LocalDB {
       }
     });
   }
-
 
   Future<void> updateDeviceStatus(Device dev, int status) async {
     final db = await initDB();
@@ -508,6 +506,41 @@ class LocalDB {
     }
   }
 
+
+  Future<void> deleteDevice(Device device) async {
+    final db = await initDB();
+
+    await db.delete(
+      'device',
+      where: 'devName = ? and divName = ?',
+      whereArgs: [device.devName, device.divName],
+    );
+
+    switch (device.type) {
+      case 'ac':
+        db.delete('ac',
+        where: 'acName = ? and divName = ?',
+        whereArgs: [device.devName, device.divName]);
+        print("deleted ac");
+        break;
+      case 'virtualAssist':
+        db.delete('virtualAssist',
+            where: 'vaName = ? and divName = ?',
+            whereArgs: [device.devName, device.divName]);
+        print("deleted ac");
+        break;
+      case 'light':
+        db.delete('light',
+            where: 'lightName = ? and divName = ?',
+            whereArgs: [device.devName, device.divName]);
+        print("deleted ac");
+        break;
+      default:
+    }
+
+    print('Device ${device.devName} deleted successfully');
+  }
+
   Future<void> updateTemperature(int newTemp, AC ac) async {
     final db = await initDB();
 
@@ -648,6 +681,8 @@ class LocalDB {
   }
 
 
+
+  //TODO: Clean DB.dart
   Future<String> getToken() async {
     final db = await initDB();
     List<Map<String, Object?>> usernameQuery = await db.rawQuery('SELECT token FROM tokens');
@@ -742,33 +777,6 @@ class LocalDB {
     await deleteDatabase(join(path, databaseName));
   }
 
-  /*Future<void> deleteUsersAndTokensTables() async {
-    final db = await initDB();
-
-    // Verifica se as tabelas existem
-    List<Map<String, Object?>> tableList = await db.rawQuery('SELECT name FROM sqlite_master WHERE type="table" AND name IN ("users", "tokens", "groups", "groupsInfo")');
-
-    // Cria um set de tabelas existentes
-    Set<String> existingTables = tableList.map((table) => table['name'].toString()).toSet();
-
-    await db.transaction((txn) async {
-      // Deleta registros apenas se a tabela existir
-      if (existingTables.contains('users')) {
-        await txn.delete('users');
-      }
-      if (existingTables.contains('tokens')) {
-        await txn.delete('tokens');
-      }
-      if (existingTables.contains('groups')) {
-        await txn.delete('groups');
-      }
-      if (existingTables.contains('groupsInfo')) {
-        await txn.delete('groupsInfo');
-      }
-    });
-    print('Tables users and tokens deleted');
-  }*/
-
   Future<void> deleteTables() async {
     String path = await getDatabasesPath();
     String dbPath = join(path, databaseName);
@@ -824,9 +832,6 @@ class LocalDB {
         print("DELETANIS A deviceRestriction");
         await txn.delete('deviceRestriction');
       }
-      //  await txn.delete('openPolls');
-      //   await txn.delete('closedPolls');
-      //  await txn.delete('pollToVote');
     });
 
     print('Table users deleted');

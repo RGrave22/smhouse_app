@@ -152,6 +152,31 @@ class _LightPageState extends State<LightPage> {
               },
               child: const Text('Save'),
             ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  String divName = light.divName;
+
+                  Device updatedDevice = Device(
+                    devName: light.lightName,
+                    isOn: light.isOn, type: 'light', divName: light.divName, houseName: light.houseName,
+                  );
+
+                  db.deleteDevice(updatedDevice);
+                  Navigator.pop(
+                    context,
+                  );
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RoomPage(divName: divName),
+                    ),
+                  );
+                });
+              },
+              child: const Text('Delete'),
+            ),
           ],
         );
       },
