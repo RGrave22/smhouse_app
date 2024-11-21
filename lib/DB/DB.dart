@@ -81,7 +81,7 @@ class LocalDB {
     Light kitchenMainLight = Light(lightName: "Luz da cozinha", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Kitchen", isOn: 0, color: "",  intensity: 0);
     Device kitchenMainLightDev = Device(devName: "Luz da cozinha", isOn: 0, type: "light", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
     AC kitchenAC = AC(acName: "AC da cozinha", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Kitchen", isOn: 0, acMode: "Cool", acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: 0, airDirection: 0, acTemp: 0);
-    Device kitchenACDev = Device(devName: "ac da cozinha", isOn: 0, type: "ac", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
+    Device kitchenACDev = Device(devName: "AC da cozinha", isOn: 0, type: "ac", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
     VirtualAssist kitchenVa = VirtualAssist(vaName: "Alexa", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Kitchen", isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarmHours: 0, alarmMinutes: 0);
     Device kitchenVaDev = Device(devName: "Alexa", isOn: 0, type: "virtualAssist", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
 
