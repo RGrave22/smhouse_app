@@ -170,8 +170,22 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
   }
 
   void updateDeviceName(String newName) async {
+    va = VirtualAssist(vaName: newName, houseName: va.houseName, divName: va.divName, isOn: va.isOn,
+          volume: va.volume, isPlaying: va.isPlaying, music: va.music, isMuted: va.isMuted,
+            alarmHours: va.alarmHours, alarmMinutes: va.alarmMinutes);
     setState(() {
       devName = newName;
+      alarmHours = va.alarmHours;
+      alarmMinutes = va.alarmMinutes;
+      isOn = va.isOn;
+      devName = va.vaName;
+      volume = va.volume;
+      isPlaying = va.isPlaying;
+      if(va.music != ""){
+        currentMusicIndex = musicList.indexOf(va.music);
+        print(currentMusicIndex);
+      }
+      isMuted = va.isMuted == 1;
     });
   }
 

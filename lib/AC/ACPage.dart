@@ -127,6 +127,7 @@ class AcPageState extends State<AcPage> {
                     isOn: ac.isOn, type: 'ac', divName: ac.divName, houseName: ac.houseName,
                   );
                   db.updateDeviceName(updatedDevice, newName);
+
                   updateDeviceName( _acNameController.text);
                 });
                 Navigator.pop(context);
@@ -140,8 +141,22 @@ class AcPageState extends State<AcPage> {
   }
 
   void updateDeviceName(String newName) async {
+    ac = AC(acName: newName, houseName: ac.houseName, divName: ac.divName, isOn: ac.isOn,
+              acMode: ac.acMode, acHoursTimer: ac.acHoursTimer, acMinutesTimer: ac.acMinutesTimer,
+                swingModeOn: ac.swingModeOn, airDirection: ac.airDirection, acTemp: ac.acTemp);
+
     setState(() {
        devName = newName;
+       currentAirDirection = ac.airDirection;
+       temperature = ac.acTemp;
+       acMode = ac.acMode;
+       hoursTimer = ac.acHoursTimer;
+       minutesTimer = ac.acMinutesTimer;
+       isOn = ac.isOn;
+       selectedHours = hoursTimer;
+       selectedMinutes = minutesTimer;
+       isSwingMode = ac.swingModeOn == 1;
+       devName = ac.acName;
     });
   }
 
@@ -149,7 +164,6 @@ class AcPageState extends State<AcPage> {
     setState(() {
       currentAirDirection = newDirection;
     });
-
     // Update the air direction in the database
     ac.airDirection = newDirection;
     print(ac);
