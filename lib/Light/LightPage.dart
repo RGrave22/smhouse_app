@@ -142,6 +142,10 @@ class _LightPageState extends State<LightPage> {
                     devName: light.lightName,
                     isOn: light.isOn, type: 'light', divName: light.divName, houseName: light.houseName,
                   );
+                  light = Light(
+                    lightName: newName,
+                    houseName: light.houseName, divName: light.divName, isOn: light.isOn, color: light.color, intensity: light.intensity
+                  );
                   db.updateDeviceName(updatedDevice, newName);
                 });
                 Navigator.pop(context);
