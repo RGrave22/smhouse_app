@@ -113,74 +113,167 @@ class _LightPageState extends State<LightPage> {
 
   }
 
-  void _showEditDialog() {
+  Future<List<Division>> getDivs(String houseName) async {
+    List<Division> divs = await db.getDivisions(houseName);
+    return divs;
+  }
+
+  Future<void> _showEditDialog() async {
+    List<Division> divisions = await getDivs(light.houseName);
+    String selectedDivName = light.divName.split(':')[2];
+
     _lightNameController.text = light.lightName;
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Edit Light Name'),
-          content: TextField(
-            controller: _lightNameController,
-            decoration: const InputDecoration(
-              labelText: 'Light Name',
-              border: OutlineInputBorder(),
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _lightNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Light Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedDivName,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    selectedDivName = newValue;
+                  }
+                },
+                items: divisions.map<DropdownMenuItem<String>>((Division division) {
+                  return DropdownMenuItem<String>(
+                    value: division.divName.split(":")[2],
+                    child: Text(division.divName.split(":")[2]),
+                  );
+                }).toList(),
+                decoration: const InputDecoration(
+                  labelText: 'Division',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
           actions: [
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Deletion'),
+                      content: const Text('Are you sure you want to delete this light?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              String divName = light.divName;
+
+                              Device updatedDevice = Device(
+                                devName: light.lightName,
+                                isOn: light.isOn,
+                                type: 'light',
+                                divName: light.divName,
+                                houseName: light.houseName,
+                              );
+
+                              db.deleteDevice(updatedDevice);
+
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RoomPage(divName: divName),
+                                ),
+                              );
+                            });
+                          },
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Text('Delete'),
+            ),
+            // Cancel button
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               child: const Text('Cancel'),
             ),
+            // Save button
             TextButton(
               onPressed: () {
                 setState(() {
                   String newName = _lightNameController.text;
+
                   Device updatedDevice = Device(
                     devName: light.lightName,
-                    isOn: light.isOn, type: 'light', divName: light.divName, houseName: light.houseName,
+                    isOn: light.isOn,
+                    type: 'light',
+                    divName: "${light.houseName}:$selectedDivName",
+                    houseName: light.houseName,
                   );
+
                   light = Light(
                     lightName: newName,
-                    houseName: light.houseName, divName: light.divName, isOn: light.isOn, color: light.color, intensity: light.intensity
+                    houseName: light.houseName,
+                    divName: "${light.houseName}:$selectedDivName",
+                    isOn: light.isOn,
+                    color: light.color,
+                    intensity: light.intensity,
                   );
+
+                  Division selectedDivision = divisions.firstWhere(
+                        (division) => division.divName == "${light.houseName}:$selectedDivName",
+                  );
+                  updateDiv(selectedDivision);
+
                   db.updateDeviceName(updatedDevice, newName);
                 });
                 Navigator.pop(context);
               },
               child: const Text('Save'),
             ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  String divName = light.divName;
-
-                  Device updatedDevice = Device(
-                    devName: light.lightName,
-                    isOn: light.isOn, type: 'light', divName: light.divName, houseName: light.houseName,
-                  );
-
-                  db.deleteDevice(updatedDevice);
-                  Navigator.pop(
-                    context,
-                  );
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RoomPage(divName: divName),
-                    ),
-                  );
-                });
-              },
-              child: const Text('Delete'),
-            ),
           ],
         );
       },
     );
+  }
+
+  void updateDiv(Division newDiv) {
+    div = newDiv;
   }
 
   @override

@@ -97,38 +97,144 @@ class AcPageState extends State<AcPage> {
     return isOn == 1;
   }
 
-  void _showEditDialog() {
+  Future<List<Division>> getDivs(String houseName) async {
+    List<Division> divs = await db.getDivisions(houseName);
+    return divs;
+  }
+
+  Future<void> _showEditDialog() async {
+    List<Division> divisions = await getDivs(ac.houseName);
+    String selectedDivName = ac.divName.split(':')[2];
     _acNameController.text = ac.acName;
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Edit AC Name'),
-          content: TextField(
-            controller: _acNameController,
-            decoration: const InputDecoration(
-              labelText: 'AC Name',
-              border: OutlineInputBorder(),
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _acNameController,
+                decoration: const InputDecoration(
+                  labelText: 'AC Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedDivName,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    selectedDivName = newValue;
+                  }
+                },
+                items: divisions.map<DropdownMenuItem<String>>((Division division) {
+                  return DropdownMenuItem<String>(
+                    value: division.divName.split(":")[2],
+                    child: Text(division.divName.split(":")[2]),
+                  );
+                }).toList(),
+                decoration: const InputDecoration(
+                  labelText: 'Division',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
           actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Deletion'),
+                      content: const Text('Are you sure you want to delete this AC?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              String divName = ac.divName;
+
+                              Device updatedDevice = Device(
+                                devName: ac.acName,
+                                isOn: ac.isOn,
+                                type: 'ac',
+                                divName: ac.divName,
+                                houseName: ac.houseName,
+                              );
+
+                              db.deleteDevice(updatedDevice);
+
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RoomPage(divName: divName),
+                                ),
+                              );
+                            });
+                          },
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Text('Delete'),
+            ),
+            // Cancel button
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               child: const Text('Cancel'),
             ),
+            // Save button
             TextButton(
               onPressed: () {
                 setState(() {
                   String newName = _acNameController.text;
+
                   Device updatedDevice = Device(
                     devName: ac.acName,
-                    isOn: ac.isOn, type: 'ac', divName: ac.divName, houseName: ac.houseName,
+                    isOn: ac.isOn,
+                    type: 'ac',
+                    divName: "${ac.houseName}:$selectedDivName",
+                    houseName: ac.houseName,
                   );
-                  db.updateDeviceName(updatedDevice, newName);
 
-                  updateDeviceName( _acNameController.text);
+                  db.updateDeviceName(updatedDevice, newName);
+                  updateDeviceName(newName, "${ac.houseName}:$selectedDivName");
+                  Division selectedDivision = divisions.firstWhere(
+                        (division) => division.divName == "${ac.houseName}:$selectedDivName",
+                  );
+                  updateDiv(selectedDivision);
                 });
                 Navigator.pop(context);
               },
@@ -140,8 +246,12 @@ class AcPageState extends State<AcPage> {
     );
   }
 
-  void updateDeviceName(String newName) async {
-    ac = AC(acName: newName, houseName: ac.houseName, divName: ac.divName, isOn: ac.isOn,
+  void updateDiv(Division newDiv) {
+    div = newDiv;
+  }
+
+  void updateDeviceName(String newName, String newDiv) async {
+    ac = AC(acName: newName, houseName: ac.houseName, divName: newDiv, isOn: ac.isOn,
               acMode: ac.acMode, acHoursTimer: ac.acHoursTimer, acMinutesTimer: ac.acMinutesTimer,
                 swingModeOn: ac.swingModeOn, airDirection: ac.airDirection, acTemp: ac.acTemp);
 

@@ -185,6 +185,8 @@ class LocalDB {
     return divisions;
   }
 
+
+
   Future<Light> getLight(String lightName) async {
     final db = await initDB();
 
@@ -198,6 +200,21 @@ class LocalDB {
     Light light = result.map((map) => Light.fromMap(map)).toList().first;
 
     return light;
+  }
+
+  Future<Division> getDiv(String divName) async {
+    final db = await initDB();
+
+    List<Map<String, Object?>> result = await db.query(
+        'division',
+        where: 'divName = ?',
+        whereArgs: [divName]
+    );
+
+    print(result);
+    Division div = result.map((map) => Division.fromMap(map)).toList().first;
+
+    return div;
   }
 
   Future<AC> getAC(String acName) async {
@@ -304,27 +321,43 @@ class LocalDB {
     String divName = dev.divName;
     await db.transaction((txn) async {
       await txn.rawUpdate(
-        'UPDATE device SET devName = ? WHERE devName = ? and divName = ?',
-        [newName, devName, divName],
+        'UPDATE device SET divName = ? WHERE devName = ?',
+        [divName, devName],
+      );
+      await txn.rawUpdate(
+        'UPDATE device SET devName = ? WHERE devName = ?',
+        [newName, devName],
       );
 
       switch (type) {
         case 'ac':
           await txn.rawUpdate(
-            'UPDATE ac SET acName = ? WHERE acName = ? and divName = ?',
-            [newName, devName, divName],
+            'UPDATE ac SET divName = ? WHERE acName = ? ',
+            [divName, devName],
+          );
+          await txn.rawUpdate(
+            'UPDATE ac SET acName = ? WHERE acName = ? ',
+            [newName, devName],
           );
           break;
         case 'virtualAssist':
           await txn.rawUpdate(
-            'UPDATE virtualAssist SET vaName = ? WHERE vaName = ? and divName = ?',
-            [newName, devName, divName],
+            'UPDATE virtualAssist SET divName = ? WHERE vaName = ? ',
+            [divName, devName],
+          );
+          await txn.rawUpdate(
+            'UPDATE virtualAssist SET vaName = ? WHERE vaName = ?',
+            [newName, devName],
           );
           break;
         case 'light':
           await txn.rawUpdate(
-            'UPDATE light SET lightName = ? WHERE lightName = ? and divName = ?',
-            [newName, devName, divName],
+            'UPDATE light SET divName = ? WHERE lightName = ? ',
+            [divName, devName],
+          );
+          await txn.rawUpdate(
+            'UPDATE light SET lightName = ? WHERE lightName = ?',
+            [newName, devName],
           );
           break;
         default:
@@ -541,6 +574,37 @@ class LocalDB {
     print('Device ${device.devName} deleted successfully');
   }
 
+  Future<void> deleteDivision(Division div) async {
+    final db = await initDB();
+
+    await db.delete(
+      'division',
+      where: 'divName = ?',
+      whereArgs: [div.divName],
+    );
+
+    await db.delete(
+      'device',
+      where: 'divName = ?',
+      whereArgs: [div.divName],
+    );
+
+    await db.delete('ac',
+        where: 'divName = ?',
+        whereArgs: [div.divName]);
+
+
+    await db.delete('virtualAssist',
+        where: 'divName = ?',
+        whereArgs: [div.divName]);
+
+    await db.delete('light',
+        where: 'and divName = ?',
+        whereArgs: [div.divName]);
+
+    print('Division ${div.divName} deleted successfully');
+  }
+
   Future<void> updateTemperature(int newTemp, AC ac) async {
     final db = await initDB();
 
@@ -641,6 +705,8 @@ class LocalDB {
 
 
   }
+
+
 
   Future<List<DivRestriction>> getUserRestrictedDivs(String memberName) async{
     final db = await initDB();
