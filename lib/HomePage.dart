@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:smhouse_app/Data/DivRestriction.dart';
 import 'package:smhouse_app/RoomPage/RoomPage.dart';
@@ -425,9 +427,10 @@ IconData _getRoomIcon(String roomName) {
           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
             String devicesOnText = snapshot.data ?? 'Loading...';
             return ListTile(
-              leading: const Icon(
-                  Icons.lock,
-                  color: Colors.teal,
+              leading: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey.withOpacity(0.0001),
+                child: const Icon(Icons.lock, color: Colors.teal, size: 30),
               ),
               title: Text(getDivName(roomName)),
               subtitle: Text("Devices on: $devicesOnText"),
@@ -447,6 +450,7 @@ IconData _getRoomIcon(String roomName) {
             return ListTile(
               leading: const CircleAvatar(
                 backgroundImage: AssetImage('assets/Logo_init.jpeg'),
+                radius: 20,
               ),
               title: Text(getDivName(roomName)),
               subtitle: Text("Devices on: $devicesOnText"),
