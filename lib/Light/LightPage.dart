@@ -26,7 +26,6 @@ class LightPage extends StatefulWidget {
   State<LightPage> createState() => _LightPageState();
 }
 
-//TODO: Add capacity to change room name
 class _LightPageState extends State<LightPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _lightNameController = TextEditingController();
@@ -151,6 +150,32 @@ class _LightPageState extends State<LightPage> {
                 Navigator.pop(context);
               },
               child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  String divName = light.divName;
+                  
+                  Device updatedDevice = Device(
+                    devName: light.lightName,
+                    isOn: light.isOn, type: 'light', divName: light.divName, houseName: light.houseName,
+                  );
+
+                  db.deleteDevice(updatedDevice);
+                  Navigator.pop(
+                    context,
+                  );
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RoomPage(divName: divName),
+                    ),
+                  );
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
             ),
           ],
         );
