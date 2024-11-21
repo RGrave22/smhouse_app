@@ -67,6 +67,10 @@ class _ProfilePage extends State<ProfilePage> {
         .join();
   }
 
+  void addUserToHouse(){
+
+  }
+
 void _showAddRoomDialog() {
   familyCodeController.text = generateRandomString();
   _obscureText = true;
@@ -165,6 +169,7 @@ void _showAddRoomDialog() {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        addUserToHouse();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
@@ -318,9 +323,17 @@ void _showAddRoomDialog() {
                             side: const BorderSide(color: Colors.black12),
                           ),
                           child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Colors.teal,
-                              child: Icon(Icons.person, color: Colors.white),
+                            leading: Container(
+                              height: 45,
+                              width: 45,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: Colors.teal.shade100,
+                                image: DecorationImage(
+                                  image: AssetImage('assets/${member.username}.jpg'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                             title: Text(member.username == member.casa.split(":")[0] ? "${member.username} (House Admin)" : member.username),
                             onTap: () {

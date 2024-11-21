@@ -61,10 +61,12 @@ class LocalDB {
     User user2 = User(username: 'Sílvia', password: 'silvia1', email: 'silvinha@gmail.com', casa: 'Ricardo:Casa Ricardo');
     User user3 = User(username: 'Mário', password: 'mario1', email: 'marinho@hotmail.com', casa: 'Ricardo:Casa Ricardo');
     User user4 = User(username: 'Jojo', password: 'jojo1', email: 'jojo@gmail.com', casa: 'Ricardo:Casa Ricardo');
+    User user5 = User(username: 'Felipe', password: 'felipe1', email: 'felipe@agros.com', casa: '');
     await db.insert('users', user1.toMap());
     await db.insert('users', user2.toMap());
     await db.insert('users', user3.toMap());
     await db.insert('users', user4.toMap());
+    await db.insert('users', user5.toMap());
 
     Casa usersHouse = Casa(houseName: 'Ricardo:Casa Ricardo', houseTemp: "16", houseOn: 0);
     await db.insert('casa', usersHouse.toMap());
@@ -93,7 +95,7 @@ class LocalDB {
     await db.insert('device', kitchenVaDev.toMap());
 
     DivRestriction user2DivRestriction = DivRestriction(restrictionName: "Sílvia:Kitchen", username: "Sílvia", divName: "Kitchen");
-    DevRestriction user2DevRestriction = DevRestriction(restrictionName: "Sílvia:Luz do Jojo", deviceName: "Luz do Jojo", username: "Sílvia", deviceRoomName: "Ricardo:Casa Ricardo:Quarto do Jojo", startingTimeHour: 3, startingTimeMinute: 0, endTimeHour: 4, endTimeMinute: 0, isAllDay: false);
+    DevRestriction user2DevRestriction = DevRestriction(restrictionName: "Sílvia:Luz do Jojo", deviceName: "Luz do Jojo", username: "Sílvia", deviceRoomName: "Ricardo:Casa Ricardo:Quarto do Jojo", startingTimeHour: 3, startingTimeMinute: 0, endTimeHour: 4, endTimeMinute: 0, isAllDay: true);
     await db.insert("divRestriction", user2DivRestriction.toMap());
     await db.insert("devRestriction", user2DevRestriction.toMap());
 

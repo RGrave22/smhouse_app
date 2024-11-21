@@ -157,10 +157,17 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
             ),
 
             const SizedBox(height: 8),
-            const CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.teal,
-              child: Icon(Icons.person, color: Colors.white, size: 50),
+            Container(
+              height: 175,
+              width: 175,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                color: Colors.teal.shade100,
+                image: DecorationImage(
+                  image: AssetImage('assets/$memberName.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -719,7 +726,7 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                   ),
                 ),
                 actions: [
-                  restrictionDeleteButton(restrictedDev, !isNew),
+                  restrictionDeleteButton(restrictedDev, !isNew, context),
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -751,7 +758,7 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
     );
   }
 
-  Widget restrictionDeleteButton (Device restrictedDev, bool isEditing){
+  Widget restrictionDeleteButton (Device restrictedDev, bool isEditing, BuildContext context){
     if(isEditing){
       return ElevatedButton(
         style: ElevatedButton.styleFrom(
