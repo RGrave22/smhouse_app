@@ -71,7 +71,9 @@ class _ProfilePage extends State<ProfilePage> {
 
   }
 
-void _showAddRoomDialog() {
+void _showAddMemberDialog() {
+  usernameController.text = generateRandomString();
+  emailController.text = generateRandomString();
   familyCodeController.text = generateRandomString();
   _obscureText = true;
   showDialog(
@@ -132,6 +134,9 @@ void _showAddRoomDialog() {
                     const SizedBox(height: 15),
                     ElevatedButton(
                       onPressed: () {
+                        setState(() {
+                          db.addUserToFamilyWithEmail(emailController.text, houseName);
+                        });
                         Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
@@ -168,6 +173,9 @@ void _showAddRoomDialog() {
                     const SizedBox(height: 15),
                     ElevatedButton(
                       onPressed: () {
+                        setState(() {
+                          db.addUserToFamilyWithUserName(usernameController.text, houseName);
+                        });
                         Navigator.of(context).pop();
                         addUserToHouse();
                       },
@@ -364,7 +372,7 @@ void _showAddRoomDialog() {
                   ),
                   Center(
                     child: ElevatedButton(
-                      onPressed: _showAddRoomDialog,
+                      onPressed: _showAddMemberDialog,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
                         shape: const CircleBorder(),

@@ -708,13 +708,27 @@ class LocalDB {
         whereArgs: ["$userName:$divName"]
       );
     }
+  }
+  
+  Future<void> addUserToFamilyWithUserName(String userName, String houseName) async {
+    final db = await initDB();
 
-
+    db.rawUpdate(
+      'UPDATE user SET houseName = ? WHERE userName = ?',
+      [houseName, userName],
+    );
   }
 
+  Future<void> addUserToFamilyWithEmail(String email, String houseName) async {
+    final db = await initDB();
 
+    db.rawUpdate(
+      'UPDATE user SET houseName = ? WHERE email = ?',
+      [houseName, email],
+    );
+  }
 
-  Future<List<DivRestriction>> getUserRestrictedDivs(String memberName) async{
+  Future<List<DivRestriction>> getUserRestrictedDivs(String memberName) async {
     final db = await initDB();
     List<Map<String, Object?>> result = await db.query("divRestriction",
       where: "username = ?",
