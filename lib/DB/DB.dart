@@ -268,10 +268,18 @@ class LocalDB {
     return family;
   }
 
-  Future<void> addDivision(Division div) async {
+  Future<bool> addDivision(Division div) async {
     final db = await initDB();
-    await db.insert('division', div.toMap());
-    print("DIVISION ADDED TO DB");
+    try {
+      await getDivision(div.divName);
+    } on StateError {
+      await db.insert('division', div.toMap());
+      print("DIVISION ADDED TO DB");
+      return true;
+    }
+
+    print("DIVISION ALREADY EXISTS ON DB");
+    return false;
   }
 
   Future<int> countDevicesOnInDivision(String divName) async {
@@ -524,8 +532,19 @@ class LocalDB {
     });
   }
 
-  Future<void> createDevice(Device device) async {
+  Future<bool> createDevice(Device device) async {
     final db = await initDB();
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT * FROM device WHERE divName = ? and devName = ?',
+      [device.divName, device.devName],
+    );
+
+    if (result.isNotEmpty) {
+      print("device with the same name exists");
+      return false;
+    }
+
     await db.insert('device', device.toMap());
 
     switch (device.type) {
@@ -543,6 +562,7 @@ class LocalDB {
         break;
       default:
     }
+    return true;
   }
 
 

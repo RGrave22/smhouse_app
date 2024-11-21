@@ -58,12 +58,15 @@ class _HomePageState extends State<HomePage> {
     return divName.split(":")[2];
   }
 
-  void addRoom(String roomName){
+  Future<bool> addRoom(String roomName) async {
     String divName = "${user.casa}:$roomName";
     Division div = Division(divName: divName, houseName: user.casa, divON: 0, divTemp: getHouseTemp().replaceAll("º", ""));
-    rooms.add(div);
-    db.addDivision(div);
+    var result = await db.addDivision(div);
+    if (result) {
+      rooms.add(div);
+    }
     print(rooms);
+    return result;
   }
 
   Future<String> getDivDevicesOn(String divName) async {
@@ -266,19 +269,27 @@ IconData _getRoomIcon(String roomName) {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Verifica se o campo está vazio e atribui um nome padrão
                   String roomName = _roomNameController.text.isEmpty
                       ? 'Room ${rooms.length + 1}'
                       : _roomNameController.text;
                   
                   Navigator.of(context).pop();
+                  var result = await addRoom(roomName);
                   setState(() {
-                    addRoom(roomName);
+
+                    if (result) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Room "$roomName" created!')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Room "$roomName" already exists!')),
+                      );
+                    }
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Room "$roomName" created!')),
-                  );
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,

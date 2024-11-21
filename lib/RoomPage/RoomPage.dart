@@ -33,6 +33,7 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
   late Division div;
   List<Device> devices = [];
   late List<DevRestriction> devRestrictions;
+
   @override
   void initState() {
     getInfo();
@@ -431,16 +432,16 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
   }
 
   Widget _buildDeviceOption(IconData icon, String label) {
-    String deviceTipe = "";
+    String deviceType = "";
     switch (label) {
       case 'Air Conditioner':
-        deviceTipe = "ac";
+        deviceType = "ac";
         break;
       case 'Virtual Assistant':
-        deviceTipe = "virtualAssist";
+        deviceType = "virtualAssist";
         break;
       case 'Light':
-        deviceTipe = "light";
+        deviceType = "light";
         break;
       default:
     }
@@ -450,7 +451,7 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
       title: Text(label, style: const TextStyle(color: Colors.teal)),
       onTap: () {
         Navigator.of(context).pop();
-        _showEditDeviceDialog(deviceTipe);
+        _showEditDeviceDialog(deviceType);
       },
     );
   }
@@ -502,21 +503,30 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    String devName = _devNameController.text.isEmpty
+                        ? 'Device ${devices.length + 1}'
+                        : _devNameController.text;
                     Device device = Device(
-                        devName: _devNameController.text,
+                        devName: devName,
                         isOn: 0,
                         type: deviceType,
                         divName: div.divName,
                         houseName: div.houseName);
                     Navigator.of(context).pop();
+                    var result = await db.createDevice(device);
                     setState(() {
-                      devices.add(device);
+                      if (result) {
+                        devices.add(device);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Device created!')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Device with the same name already exists!')),
+                        );
+                      }
                     });
-                    db.createDevice(device);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Device created!')),
-                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
