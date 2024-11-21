@@ -155,7 +155,7 @@ class _LightPageState extends State<LightPage> {
               onPressed: () {
                 setState(() {
                   String divName = light.divName;
-                  
+
                   Device updatedDevice = Device(
                     devName: light.lightName,
                     isOn: light.isOn, type: 'light', divName: light.divName, houseName: light.houseName,
@@ -173,7 +173,6 @@ class _LightPageState extends State<LightPage> {
                     ),
                   );
                 });
-                Navigator.pop(context);
               },
               child: const Text('Delete'),
             ),
