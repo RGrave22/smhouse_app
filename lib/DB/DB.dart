@@ -57,31 +57,31 @@ class LocalDB {
   Future<void> insertDefaultUsers() async {
     final db = await initDB();
 
-    User user1 = User(username: 'user1', password: 'password1', email: 'user1@example.com', casa: 'user1:UsersHouse');
-    User user2 = User(username: 'user2', password: 'password2', email: 'user2@example.com', casa: 'user1:UsersHouse');
-    User user3 = User(username: 'user3', password: 'password3', email: 'user3@example.com', casa: 'user1:UsersHouse');
-    User user4 = User(username: '1', password: '1', email: '1', casa: 'user1:UsersHouse');
+    User user1 = User(username: 'Ricardo', password: 'ricardo1', email: 'ricardo@gmail.com', casa: 'Ricardo:Casa Ricardo');
+    User user2 = User(username: 'Sílvia', password: 'silvia1', email: 'silvinha@gmail.com', casa: 'Ricardo:Casa Ricardo');
+    User user3 = User(username: 'Mário', password: 'mario1', email: 'marinho@hotmail.com', casa: 'Ricardo:Casa Ricardo');
+    User user4 = User(username: 'Jojo', password: 'jojo1', email: 'jojo@gmail.com', casa: 'Ricardo:Casa Ricardo');
     await db.insert('users', user1.toMap());
     await db.insert('users', user2.toMap());
     await db.insert('users', user3.toMap());
     await db.insert('users', user4.toMap());
 
-    Casa usersHouse = Casa(houseName: 'user1:UsersHouse', houseTemp: "16", houseOn: 0);
+    Casa usersHouse = Casa(houseName: 'Ricardo:Casa Ricardo', houseTemp: "16", houseOn: 0);
     await db.insert('casa', usersHouse.toMap());
 
-    Division kitchen = Division(divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse", divON: 0, divTemp: "20");
-    Division alexandersBedroom = Division(divName: "user1:UsersHouse:alexandersBedroom", houseName: "user1:UsersHouse", divON: 0, divTemp: "16");
+    Division kitchen = Division(divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo", divON: 0, divTemp: "20");
+    Division alexandersBedroom = Division(divName: "Ricardo:Casa Ricardo:Quarto do Jojo", houseName: "Ricardo:Casa Ricardo", divON: 0, divTemp: "16");
     await db.insert('division', kitchen.toMap());
     await db.insert('division', alexandersBedroom.toMap());
 
-    Light alexandersLight = Light(lightName: "AlexandersLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:alexandersBedroom", isOn: 0, color: "", intensity: 0);
-    Device alexandersLightDev = Device(devName: "AlexandersLight", isOn: 0, type: "light", divName: "user1:UsersHouse:alexandersBedroom", houseName: "user1:UsersHouse");
-    Light kitchenMainLight = Light(lightName: "kitchenMainLight", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, color: "",  intensity: 0);
-    Device kitchenMainLightDev = Device(devName: "kitchenMainLight", isOn: 0, type: "light", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
-    AC kitchenAC = AC(acName: "kitchenAC", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, acMode: "Cool", acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: 0, airDirection: 0, acTemp: 0);
-    Device kitchenACDev = Device(devName: "kitchenAC", isOn: 0, type: "ac", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
-    VirtualAssist kitchenVa = VirtualAssist(vaName: "Alexa", houseName: "user1:UsersHouse", divName: "user1:UsersHouse:kitchen", isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarmHours: 0, alarmMinutes: 0);
-    Device kitchenVaDev = Device(devName: "Alexa", isOn: 0, type: "virtualAssist", divName: "user1:UsersHouse:kitchen", houseName: "user1:UsersHouse");
+    Light alexandersLight = Light(lightName: "Luz do Jojo", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Quarto do Jojo", isOn: 0, color: "", intensity: 0);
+    Device alexandersLightDev = Device(devName: "Luz do Jojo", isOn: 0, type: "light", divName: "Ricardo:Casa Ricardo:Quarto do Jojo", houseName: "Ricardo:Casa Ricardo");
+    Light kitchenMainLight = Light(lightName: "Luz da cozinha", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Kitchen", isOn: 0, color: "",  intensity: 0);
+    Device kitchenMainLightDev = Device(devName: "Luz da cozinha", isOn: 0, type: "light", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
+    AC kitchenAC = AC(acName: "AC da cozinha", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Kitchen", isOn: 0, acMode: "Cool", acHoursTimer: 0, acMinutesTimer: 0, swingModeOn: 0, airDirection: 0, acTemp: 0);
+    Device kitchenACDev = Device(devName: "ac da cozinha", isOn: 0, type: "ac", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
+    VirtualAssist kitchenVa = VirtualAssist(vaName: "Alexa", houseName: "Ricardo:Casa Ricardo", divName: "Ricardo:Casa Ricardo:Kitchen", isOn: 0, volume: 0, isPlaying: 0, music: "", isMuted: 0, alarmHours: 0, alarmMinutes: 0);
+    Device kitchenVaDev = Device(devName: "Alexa", isOn: 0, type: "virtualAssist", divName: "Ricardo:Casa Ricardo:Kitchen", houseName: "Ricardo:Casa Ricardo");
 
     await db.insert('light', alexandersLight.toMap());
     await db.insert('light', kitchenMainLight.toMap());
@@ -92,8 +92,8 @@ class LocalDB {
     await db.insert('device', kitchenACDev.toMap());
     await db.insert('device', kitchenVaDev.toMap());
 
-    DivRestriction user2DivRestriction = DivRestriction(restrictionName: "user2:kitchen", username: "user2", divName: "kitchen");
-    DevRestriction user2DevRestriction = DevRestriction(restrictionName: "user2:AlexandersLight", deviceName: "AlexandersLight", username: "user2", deviceRoomName: "user1:UsersHouse:alexandersBedroom", startingTimeHour: 3, startingTimeMinute: 0, endTimeHour: 4, endTimeMinute: 0, isAllDay: false);
+    DivRestriction user2DivRestriction = DivRestriction(restrictionName: "Sílvia:Kitchen", username: "Sílvia", divName: "Kitchen");
+    DevRestriction user2DevRestriction = DevRestriction(restrictionName: "Sílvia:Luz do Jojo", deviceName: "Luz do Jojo", username: "Sílvia", deviceRoomName: "Ricardo:Casa Ricardo:Quarto do Jojo", startingTimeHour: 3, startingTimeMinute: 0, endTimeHour: 4, endTimeMinute: 0, isAllDay: false);
     await db.insert("divRestriction", user2DivRestriction.toMap());
     await db.insert("devRestriction", user2DevRestriction.toMap());
 
