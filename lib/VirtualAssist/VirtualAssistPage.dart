@@ -127,37 +127,148 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
     }
   }
 
-  void _showEditDialog() {
+  Future<List<Division>> getDivs(String houseName) async {
+    List<Division> divs = await db.getDivisions(houseName);
+    return divs;
+  }
+
+  void _showEditDialog() async {
     _vaNameController.text = va.vaName;
+    List<Division> divisions = await getDivs(va.houseName);
+    String selectedDivName = va.divName.split(':')[2];
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit AC Name'),
-          content: TextField(
-            controller: _vaNameController,
-            decoration: const InputDecoration(
-              labelText: 'AC Name',
-              border: OutlineInputBorder(),
-            ),
+          title: const Text('Edit V.Assistant Name'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _vaNameController,
+                decoration: const InputDecoration(
+                  labelText: 'V.Assistant Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedDivName,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    selectedDivName = newValue;
+                  }
+                },
+                items: divisions.map<DropdownMenuItem<String>>((Division division) {
+                  return DropdownMenuItem<String>(
+                    value: division.divName.split(":")[2],
+                    child: Text(division.divName.split(":")[2]),
+                  );
+                }).toList(),
+                decoration: const InputDecoration(
+                  labelText: 'Division',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
           actions: [
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                // Show confirmation dialog before deletion
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Deletion'),
+                      content: const Text('Are you sure you want to delete this virtual assistant?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              String divName = va.divName;
+
+                              Device updatedDevice = Device(
+                                devName: va.vaName,
+                                isOn: va.isOn,
+                                type: 'virtualAssist',
+                                divName: va.divName,
+                                houseName: va.houseName,
+                              );
+
+                              db.deleteDevice(updatedDevice);
+
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RoomPage(divName: divName),
+                                ),
+                              );
+                            });
+                          },
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Text('Delete'),
+            ),
+            // Cancel button
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               child: const Text('Cancel'),
             ),
+            // Save button
             TextButton(
               onPressed: () {
                 setState(() {
                   String newName = _vaNameController.text;
+
                   Device updatedDevice = Device(
                     devName: va.vaName,
-                    isOn: va.isOn, type: 'virtualAssist', divName: va.divName, houseName: va.houseName,
+                    isOn: va.isOn,
+                    type: 'virtualAssist',
+                    divName: "${va.houseName}:$selectedDivName",
+                    houseName: va.houseName,
                   );
+
+                  print(selectedDivName);
                   db.updateDeviceName(updatedDevice, newName);
-                  updateDeviceName( _vaNameController.text);
+                  updateDeviceName(newName, "${va.houseName}:$selectedDivName");
+                  Division selectedDivision = divisions.firstWhere(
+                        (division) => division.divName == "${va.houseName}:$selectedDivName",
+                  );
+                  print(selectedDivision);
+                  updateDiv(selectedDivision);
+                  //va.divName = selectedDivName;
                 });
                 Navigator.pop(context);
               },
@@ -169,9 +280,28 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
     );
   }
 
-  void updateDeviceName(String newName) async {
+  void updateDiv(Division newDiv) {
+    div = newDiv;
+    divName = newDiv.divName.split(':')[2];
+  }
+
+  void updateDeviceName(String newName, String newDiv) async {
+    va = VirtualAssist(vaName: newName, houseName: va.houseName, divName: newDiv, isOn: va.isOn,
+          volume: va.volume, isPlaying: va.isPlaying, music: va.music, isMuted: va.isMuted,
+            alarmHours: va.alarmHours, alarmMinutes: va.alarmMinutes);
     setState(() {
       devName = newName;
+      alarmHours = va.alarmHours;
+      alarmMinutes = va.alarmMinutes;
+      isOn = va.isOn;
+      devName = va.vaName;
+      volume = va.volume;
+      isPlaying = va.isPlaying;
+      if(va.music != ""){
+        currentMusicIndex = musicList.indexOf(va.music);
+        print(currentMusicIndex);
+      }
+      isMuted = va.isMuted == 1;
     });
   }
 
@@ -465,7 +595,7 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
                         shape: const CircleBorder(),
                         padding: const EdgeInsets.all(10),
                         side: BorderSide(
-                          color: isOn == 1 ? Colors.green : Colors.grey,
+                          color: isOn == 1 ? Colors.green : Colors.red,
                           width: 3,
                         ),
                       ),

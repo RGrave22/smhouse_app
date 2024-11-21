@@ -189,6 +189,8 @@ class LocalDB {
     return divisions;
   }
 
+
+
   Future<Light> getLight(String lightName) async {
     final db = await initDB();
 
@@ -202,6 +204,21 @@ class LocalDB {
     Light light = result.map((map) => Light.fromMap(map)).toList().first;
 
     return light;
+  }
+
+  Future<Division> getDiv(String divName) async {
+    final db = await initDB();
+
+    List<Map<String, Object?>> result = await db.query(
+        'division',
+        where: 'divName = ?',
+        whereArgs: [divName]
+    );
+
+    print(result);
+    Division div = result.map((map) => Division.fromMap(map)).toList().first;
+
+    return div;
   }
 
   Future<AC> getAC(String acName) async {
@@ -301,7 +318,6 @@ class LocalDB {
     return division;
   }
 
-
   Future<void> updateDeviceName(Device dev, String newName) async {
     final db = await initDB();
     String devName =  dev.devName;
@@ -309,34 +325,49 @@ class LocalDB {
     String divName = dev.divName;
     await db.transaction((txn) async {
       await txn.rawUpdate(
-        'UPDATE device SET devName = ? WHERE devName = ? and divName = ?',
-        [newName, devName, divName],
+        'UPDATE device SET divName = ? WHERE devName = ?',
+        [divName, devName],
+      );
+      await txn.rawUpdate(
+        'UPDATE device SET devName = ? WHERE devName = ?',
+        [newName, devName],
       );
 
       switch (type) {
         case 'ac':
           await txn.rawUpdate(
-            'UPDATE ac SET acName = ? WHERE acName = ? and divName = ?',
-            [newName, devName, divName],
+            'UPDATE ac SET divName = ? WHERE acName = ? ',
+            [divName, devName],
+          );
+          await txn.rawUpdate(
+            'UPDATE ac SET acName = ? WHERE acName = ? ',
+            [newName, devName],
           );
           break;
         case 'virtualAssist':
           await txn.rawUpdate(
-            'UPDATE virtualAssist SET vaName = ? WHERE vaName = ? and divName = ?',
-            [newName, devName, divName],
+            'UPDATE virtualAssist SET divName = ? WHERE vaName = ? ',
+            [divName, devName],
+          );
+          await txn.rawUpdate(
+            'UPDATE virtualAssist SET vaName = ? WHERE vaName = ?',
+            [newName, devName],
           );
           break;
         case 'light':
           await txn.rawUpdate(
-            'UPDATE light SET lightName = ? WHERE lightName = ? and divName = ?',
-            [newName, devName, divName],
+            'UPDATE light SET divName = ? WHERE lightName = ? ',
+            [divName, devName],
+          );
+          await txn.rawUpdate(
+            'UPDATE light SET lightName = ? WHERE lightName = ?',
+            [newName, devName],
           );
           break;
         default:
       }
     });
   }
-
 
   Future<void> updateDeviceStatus(Device dev, int status) async {
     final db = await initDB();
@@ -512,6 +543,72 @@ class LocalDB {
     }
   }
 
+
+  Future<void> deleteDevice(Device device) async {
+    final db = await initDB();
+
+    await db.delete(
+      'device',
+      where: 'devName = ? and divName = ?',
+      whereArgs: [device.devName, device.divName],
+    );
+
+    switch (device.type) {
+      case 'ac':
+        db.delete('ac',
+        where: 'acName = ? and divName = ?',
+        whereArgs: [device.devName, device.divName]);
+        print("deleted ac");
+        break;
+      case 'virtualAssist':
+        db.delete('virtualAssist',
+            where: 'vaName = ? and divName = ?',
+            whereArgs: [device.devName, device.divName]);
+        print("deleted ac");
+        break;
+      case 'light':
+        db.delete('light',
+            where: 'lightName = ? and divName = ?',
+            whereArgs: [device.devName, device.divName]);
+        print("deleted ac");
+        break;
+      default:
+    }
+
+    print('Device ${device.devName} deleted successfully');
+  }
+
+  Future<void> deleteDivision(Division div) async {
+    final db = await initDB();
+
+    await db.delete(
+      'division',
+      where: 'divName = ?',
+      whereArgs: [div.divName],
+    );
+
+    await db.delete(
+      'device',
+      where: 'divName = ?',
+      whereArgs: [div.divName],
+    );
+
+    await db.delete('ac',
+        where: 'divName = ?',
+        whereArgs: [div.divName]);
+
+
+    await db.delete('virtualAssist',
+        where: 'divName = ?',
+        whereArgs: [div.divName]);
+
+    await db.delete('light',
+        where: 'and divName = ?',
+        whereArgs: [div.divName]);
+
+    print('Division ${div.divName} deleted successfully');
+  }
+
   Future<void> updateTemperature(int newTemp, AC ac) async {
     final db = await initDB();
 
@@ -613,6 +710,8 @@ class LocalDB {
 
   }
 
+
+
   Future<List<DivRestriction>> getUserRestrictedDivs(String memberName) async{
     final db = await initDB();
     List<Map<String, Object?>> result = await db.query("divRestriction",
@@ -653,6 +752,8 @@ class LocalDB {
   }
 
 
+
+  //TODO: Clean DB.dart
   Future<String> getToken() async {
     final db = await initDB();
     List<Map<String, Object?>> usernameQuery = await db.rawQuery('SELECT token FROM tokens');
@@ -747,33 +848,6 @@ class LocalDB {
     await deleteDatabase(join(path, databaseName));
   }
 
-  /*Future<void> deleteUsersAndTokensTables() async {
-    final db = await initDB();
-
-    // Verifica se as tabelas existem
-    List<Map<String, Object?>> tableList = await db.rawQuery('SELECT name FROM sqlite_master WHERE type="table" AND name IN ("users", "tokens", "groups", "groupsInfo")');
-
-    // Cria um set de tabelas existentes
-    Set<String> existingTables = tableList.map((table) => table['name'].toString()).toSet();
-
-    await db.transaction((txn) async {
-      // Deleta registros apenas se a tabela existir
-      if (existingTables.contains('users')) {
-        await txn.delete('users');
-      }
-      if (existingTables.contains('tokens')) {
-        await txn.delete('tokens');
-      }
-      if (existingTables.contains('groups')) {
-        await txn.delete('groups');
-      }
-      if (existingTables.contains('groupsInfo')) {
-        await txn.delete('groupsInfo');
-      }
-    });
-    print('Tables users and tokens deleted');
-  }*/
-
   Future<void> deleteTables() async {
     String path = await getDatabasesPath();
     String dbPath = join(path, databaseName);
@@ -829,9 +903,6 @@ class LocalDB {
         print("DELETANIS A devRestriction");
         await txn.delete('devRestriction');
       }
-      //  await txn.delete('openPolls');
-      //   await txn.delete('closedPolls');
-      //  await txn.delete('pollToVote');
     });
 
     print('Table users deleted');
