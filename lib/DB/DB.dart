@@ -103,14 +103,14 @@ class LocalDB {
   }
 
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(String email, String password) async {
     try {
       final db = await initDB();
 
       List<Map<String, dynamic>> result = await db.query(
         'users',
-        where: 'username = ?',
-        whereArgs: [username],
+        where: 'email = ?',
+        whereArgs: [email],
       );
 
       if (result.isEmpty) {
@@ -145,13 +145,13 @@ class LocalDB {
     await db.insert('session', user.toMap());
   }
 
-  Future<bool> userExist(String username) async {
+  Future<bool> userExist(String email) async {
     final db = await initDB();
 
     List<Map<String, dynamic>> existingUsers = await db.query(
       'users',
-      where: 'username = ?',
-      whereArgs: [username],
+      where: 'email = ?',
+      whereArgs: [email],
     );
     return existingUsers.isNotEmpty;
   }
