@@ -5,6 +5,7 @@ import 'package:smhouse_app/Data/Device.dart';
 import 'package:smhouse_app/Data/DivRestriction.dart';
 import 'package:smhouse_app/Data/Division.dart';
 
+import '../AC/ACPage.dart';
 import '../DB/DB.dart';
 import '../Data/DevRestriction.dart';
 import '../Data/User.dart';
@@ -31,6 +32,17 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
   //late String memberBirthday;
   bool isLoading = true;
 
+  //restriced device times
+  late int startHour = 9;
+  late int startMin = 0;
+  late int endHour = 17;
+  late int endMin = 0;
+  late bool isAllDay = false;
+
+  final String STARTING_TIME_CONTROLLER = "start";
+  final String ENDING_TIME_CONTROLLER = "end";
+  final int HOUR_LIMIT = 23;
+  final int MINUTE_LIMIT = 59;
 
   @override
   void initState() {
@@ -93,6 +105,14 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
       setState(() {});
   }
 
+  void callUpdateDeviceRestriction(DevRestriction dev, BuildContext context){
+    for(Device d in devs){
+      if(d.devName == dev.deviceName){
+        return _showRestrictionHoursDialog(d, context, false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -135,11 +155,7 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const Text(
-              "(grau de parentesco)",
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
+
             const SizedBox(height: 8),
             const CircleAvatar(
               radius: 50,
@@ -190,7 +206,6 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                             activeColor: Colors.green,
                             inactiveThumbColor: Colors.grey,
                           ),
-                          const Icon(Icons.chevron_right),
                         ],
                       ),
                     ),
@@ -250,7 +265,7 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                           side: const BorderSide(color: Colors.black12),
                         ),
                         child: ListTile(
-                          title: Text(dev.deviceName),
+                          title: Text("${dev.deviceName} (${dev.deviceRoomName.split(":")[2]})"),
                           trailing: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -258,6 +273,9 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                               Icon(Icons.chevron_right),
                             ],
                           ),
+                          onTap: () => {
+                            callUpdateDeviceRestriction(dev, context)
+                          },
                         ),
                       );
                     }
@@ -272,6 +290,10 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
   }
 
   void _showChooseDevice() {
+    startHour = 9;
+    startMin = 0;
+    endHour = 17;
+    endMin = 0;
     showDialog(
       context: context,
       builder: (context) {
@@ -301,7 +323,7 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                     ),
                     onTap: () => {
                       Navigator.pop(context),
-                      _showRestrictionHoursDialog(dev)
+                      _showRestrictionHoursDialog(dev, context, true)
                     },
                   );
                 }
@@ -315,25 +337,6 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
               },
               child: const Text('Cancel'),
             ),
-        // TextButton(
-        //   onPressed: () {
-        //     setState(() {
-        //       List<String> name = div.divName.split(":");
-        //       String newName =
-        //           "${name[0]}:${name[1]}:${_roomNameController.text}";
-        //       db.updateDivName(newName, div.divName);
-        //
-        //       div = Division(
-        //         divName: newName,
-        //         houseName: div.houseName,
-        //         divON: div.divON,
-        //         divTemp: div.divTemp,
-        //       );
-        //     });
-        //     Navigator.pop(context);
-        //   },
-        //   child: const Text('Save'),
-        // ),
         ],
 
         );
@@ -341,60 +344,547 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
     );
   }
 
-  void _showRestrictionHoursDialog(Device restrictedDev){
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-              'Set Prohibition Time',
-            textAlign: TextAlign.center,
-          ),
-          content: Container(
-            width: double.maxFinite,
-            child:Column(
-              children: [
-                Text(
-                  "${restrictedDev.devName}\n(${restrictedDev.divName.split(":")[2]})",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold
-                  ),
-                  textAlign: TextAlign.center,
-                )
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            // TextButton(
-            //   onPressed: () {
-            //     setState(() {
-            //       List<String> name = div.divName.split(":");
-            //       String newName =
-            //           "${name[0]}:${name[1]}:${_roomNameController.text}";
-            //       db.updateDivName(newName, div.divName);
-            //
-            //       div = Division(
-            //         divName: newName,
-            //         houseName: div.houseName,
-            //         divON: div.divON,
-            //         divTemp: div.divTemp,
-            //       );
-            //     });
-            //     Navigator.pop(context);
-            //   },
-            //   child: const Text('Save'),
-            // ),
-          ],
+  void updateHour(bool isUp, bool isStart) {
+    if (isUp) {
+      if(isStart) {
+        if (startHour + 1 > HOUR_LIMIT) {
+          setState(() {
+            startHour = 0;
+          });
+        } else {
+          setState(() {
+            startHour++;
+          });
+        }
+      }else{
+        if (endHour + 1 > HOUR_LIMIT) {
+          setState(() {
+            endHour = 0;
+          });
+        } else {
+          setState(() {
+            endHour++;
+          });
+        }
+      }
+    } else {
+      if(isStart) {
+        if (startHour - 1 < 0) {
+          setState(() {
+            startHour = HOUR_LIMIT;
+          });
+        } else {
+          setState(() {
+            startHour--;
+          });
+        }
+      }else{
+        if (endHour - 1 < 0) {
+          setState(() {
+            endHour = HOUR_LIMIT;
+          });
+        } else {
+          setState(() {
+            endHour--;
+          });
+        }
+      }
+    }
+  }
 
+  void updateMin(bool isUp, bool isStart) {
+    if (isUp) {
+      if(isStart){
+        if (startMin + 1 > MINUTE_LIMIT) {
+          setState(() {
+            startMin = 0;
+          });
+        } else {
+          setState(() {
+            startMin++;
+          });
+        }
+      }else{
+        if (endMin + 1 > MINUTE_LIMIT) {
+          setState(() {
+            endMin = 0;
+          });
+        } else {
+          setState(() {
+            endMin++;
+          });
+        }
+      }
+
+    } else {
+      if(isStart){
+        if (startMin - 1 < 0) {
+          setState(() {
+            startMin = MINUTE_LIMIT;
+          });
+        } else {
+          setState(() {
+            startMin--;
+          });
+        }
+      }else{
+        if (endMin - 1 < 0) {
+          setState(() {
+            endMin = MINUTE_LIMIT;
+          });
+        } else {
+          setState(() {
+            endMin--;
+          });
+        }
+      }
+
+    }
+  }
+
+
+  void _showRestrictionHoursDialog(Device restrictedDev, BuildContext context1, bool isNew){
+
+    DevRestriction dr = DevRestriction(restrictionName: "", deviceName: "", username: "", deviceRoomName: "", startingTimeHour: 0, startingTimeMinute: 0, endTimeHour: 0, endTimeMinute: 0, isAllDay: false);
+    if(!isNew){
+      for(DevRestriction i in restrictedDevs){
+        if(i.deviceName == restrictedDev.devName){
+          dr = i;
+        }
+      }
+      startHour = dr.startingTimeHour;
+      startMin = dr.startingTimeMinute;
+      endHour = dr.endTimeMinute;
+      endMin = dr.endTimeMinute;
+      isAllDay = dr.isAllDay;
+    }
+
+    showDialog(
+      context: context1,
+      builder: (context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState){
+              return AlertDialog(
+                title: const Text(
+                  'Set Prohibition Time',
+                  textAlign: TextAlign.center,
+                ),
+
+                content: SingleChildScrollView(
+                  child: Container(
+                    width: double.maxFinite,
+                    child:Column(
+                      children: [
+                        Text(
+                          "${restrictedDev.devName}\n(${restrictedDev.divName.split(":")[2]})",
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                          indent: 16,
+                          endIndent: 16,
+                        ),
+                        Row(
+                            children: [
+                              const Text(
+                                  'Restrict All Day',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 16)
+                              ),
+                              Spacer(),
+                              Switch(
+                                  value: isAllDay,
+                                  onChanged: (value) => {
+                                    setState(()=>
+                                      isAllDay = value
+                                    )
+                                  }
+                              )
+                            ]
+                        ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                          indent: 16,
+                          endIndent: 16,
+                        ),
+                        const Text(
+                            'Set Starting Time',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16)
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        updateHour(true, true);
+                                      });
+                                    },
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: CustomPaint(
+                                        painter: TrianglePainter(isUpward: true, color: Colors.teal),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  Text(
+                                    '${startHour.toString().padLeft(2, '0')} h',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  // Downward Triangle Button (Decrease Temperature)
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        updateHour(false, true);
+                                      });
+                                    },
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: CustomPaint(
+                                        painter: TrianglePainter(isUpward: false, color: Colors.teal),
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                            ),
+                            const SizedBox(width: 70),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      updateMin(true, true);
+                                    });
+                                  },
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CustomPaint(
+                                      painter: TrianglePainter(isUpward: true, color: Colors.teal),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10,),
+                                Text(
+                                  '${startMin.toString().padLeft(2, '0')} min',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 10,),
+                                // Downward Triangle Button (Decrease Temperature)
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      updateMin(false, true);
+                                    });
+                                  },
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CustomPaint(
+                                      painter: TrianglePainter(isUpward: false, color: Colors.teal),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                            'Set Ending Time',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16)
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        updateHour(true, false);
+                                      });
+                                    },
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: CustomPaint(
+                                        painter: TrianglePainter(isUpward: true, color: Colors.teal),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  Text(
+                                    '${endHour.toString().padLeft(2, '0')} h',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  // Downward Triangle Button (Decrease Temperature)
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        updateHour(false, false);
+                                      });
+                                    },
+                                    child: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: CustomPaint(
+                                        painter: TrianglePainter(isUpward: false, color: Colors.teal),
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                            ),
+                            const SizedBox(width: 70),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      updateMin(true, false);
+                                    });
+                                  },
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CustomPaint(
+                                      painter: TrianglePainter(isUpward: true, color: Colors.teal),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10,),
+                                Text(
+                                  '${endMin.toString().padLeft(2, '0')} min',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 10,),
+                                // Downward Triangle Button (Decrease Temperature)
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      updateMin(false, false);
+                                    });
+                                  },
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CustomPaint(
+                                      painter: TrianglePainter(isUpward: false, color: Colors.teal),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  restrictionDeleteButton(restrictedDev, !isNew),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: const BorderSide(color: Colors.teal),
+                      ),
+                      padding: const EdgeInsets.all(15),
+                    ),
+                    onPressed: () {
+                      updateDeviceRestriction(restrictedDev.devName, restrictedDev.divName, isAllDay, isNew);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Done', style: TextStyle(color: Colors.white)),
+                  ),
+
+                ],
+              );
+            }
         );
+
       },
+    );
+  }
+
+  Widget restrictionDeleteButton (Device restrictedDev, bool isEditing){
+    if(isEditing){
+      return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: const BorderSide(color: Colors.red),
+          ),
+          padding: const EdgeInsets.all(15),
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          deleteDeviceRestriction(restrictedDev);
+        },
+        child: const Text('Delete', style: TextStyle(color: Colors.white)),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  void deleteDeviceRestriction(Device restrictedDev) async{
+    setState(() {
+      setState(() {
+        restrictedDevs.removeWhere((devR) => devR.restrictionName == "$memberName:${restrictedDev.devName}");
+      });
+    });
+    await db.deleteDevRestriction("$memberName:${restrictedDev.devName}");
+    await updateRestrictedDivsList();
+  }
+
+  void updateDeviceRestriction(String devName, String devRoomName, bool allDay, bool isNew) async{
+    setState(() {
+      if (isNew) {
+        setState(() {
+          restrictedDevs.add(DevRestriction(restrictionName: "$memberName:$devName", deviceName: devName, username: memberName, deviceRoomName: devRoomName,
+              startingTimeHour: startHour, startingTimeMinute: startMin, endTimeHour: endHour, endTimeMinute: endMin, isAllDay: allDay));
+        });
+      } else {
+        setState(() {
+          restrictedDevs.removeWhere((devR) => devR.restrictionName == "$memberName:$devName");
+          restrictedDevs.add(DevRestriction(restrictionName: "$memberName:$devName", deviceName: devName, username: memberName, deviceRoomName: devRoomName,
+              startingTimeHour: startHour, startingTimeMinute: startMin, endTimeHour: endHour, endTimeMinute: endMin, isAllDay: allDay));
+        });
+
+      }
+    });
+    await db.updateDevRestriction(devName, memberName, devRoomName, startHour, startMin, endHour, endMin, allDay, isNew);
+    await updateRestrictedDivsList();
+
+    setState(() {});
+  }
+
+  Row timeSetRow(String startOrEndController){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+
+                },
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CustomPaint(
+                    painter: TrianglePainter(isUpward: true, color: Colors.teal),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10,),
+              Text(
+                'HH h',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 10,),
+              // Downward Triangle Button (Decrease Temperature)
+              GestureDetector(
+                onTap: () {},
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CustomPaint(
+                    painter: TrianglePainter(isUpward: false, color: Colors.teal),
+                  ),
+                ),
+              ),
+            ]
+        ),
+        const SizedBox(width: 70),
+        Column(
+          children: [
+            GestureDetector(
+              onTap: () {},
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: CustomPaint(
+                  painter: TrianglePainter(isUpward: true, color: Colors.teal),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10,),
+            Text(
+              'MM min',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 10,),
+            // Downward Triangle Button (Decrease Temperature)
+            GestureDetector(
+              onTap: () {},
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: CustomPaint(
+                  painter: TrianglePainter(isUpward: false, color: Colors.teal),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

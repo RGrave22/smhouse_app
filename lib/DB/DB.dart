@@ -49,7 +49,7 @@ class LocalDB {
       await txn.execute('CREATE TABLE ac (acName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, acMode TEXT, acHoursTimer INTEGER, acMinutesTimer INTEGER, swingModeOn INTEGER, airDirection INTEGER, acTemp INTEGER)');
       await txn.execute('CREATE TABLE virtualAssist (vaName TEXT PRIMARY KEY, houseName TEXT, divName TEXT, isOn INTEGER, volume INTEGER, isPlaying INTEGER, music TEXT, isMuted INTEGER, alarmHours INTEGER, alarmMinutes INTEGER)');
       await txn.execute('CREATE TABLE divRestriction (restrictionName TEXT PRIMARY KEY, divName TEXT,  username TEXT)');
-      await txn.execute('CREATE TABLE devRestriction (restrictionName TEXT PRIMARY KEY, deviceName TEXT, username TEXT, startingTime TEXT, endTime TEXT)');
+      await txn.execute('CREATE TABLE devRestriction (restrictionName TEXT PRIMARY KEY, deviceName TEXT, username TEXT, deviceRoomName TEXT, startingTimeHour INTEGER, startingTimeMinute INTEGER, endTimeHour INTEGER, endTimeMinute INTEGER, isAllDay INTEGER)');
     });
 
   }
@@ -92,6 +92,10 @@ class LocalDB {
     await db.insert('device', kitchenACDev.toMap());
     await db.insert('device', kitchenVaDev.toMap());
 
+    DivRestriction user2DivRestriction = DivRestriction(restrictionName: "user2:kitchen", username: "user2", divName: "kitchen");
+    DevRestriction user2DevRestriction = DevRestriction(restrictionName: "user2:AlexandersLight", deviceName: "AlexandersLight", username: "user2", deviceRoomName: "user1:UsersHouse:alexandersBedroom", startingTimeHour: 3, startingTimeMinute: 0, endTimeHour: 4, endTimeMinute: 0, isAllDay: false);
+    await db.insert("divRestriction", user2DivRestriction.toMap());
+    await db.insert("devRestriction", user2DevRestriction.toMap());
 
     print('Default users inserted.');
   }
@@ -620,20 +624,21 @@ class LocalDB {
     return dr;
   }
 
-  //      await txn.execute('CREATE TABLE devRestriction (restrictionName TEXT PRIMARY KEY, deviceName TEXT, username TEXT, startingTime TEXT, endTime TEXT)');
-  Future<void> updateDevRestriction(String devName, String userName, String startTime, String endTime, bool isAdding) async{
+  //await txn.execute('CREATE TABLE devRestriction (restrictionName TEXT PRIMARY KEY, deviceName TEXT, username TEXT, deviceRoomName TEXT, startingTimeHour INTEGER, startingTimeMinute INTEGER, endTimeHour INTEGER, endTimeMinute INTEGER, isAllDay INTEGER)');
+  Future<void> updateDevRestriction(String devName, String userName, String deviceRoomName, int startTimeHour, int startTimeMinute, int endTimeHour, int endTimeMinute, bool isAllDay, bool isAdding) async{
     final db = await initDB();
-    DevRestriction dr = new DevRestriction(restrictionName: "$userName:$devName", deviceName: devName, username: userName, startingTime: startTime, endTime: endTime);
+    DevRestriction dr = DevRestriction(restrictionName: "$userName:$devName", deviceName: devName, username: userName, deviceRoomName: deviceRoomName,
+        startingTimeHour: startTimeHour, startingTimeMinute: startTimeMinute, endTimeHour: endTimeHour, endTimeMinute: endTimeMinute, isAllDay: isAllDay);
 
     if(isAdding){
       await db.insert("devRestriction", dr.toMap());
     }else{
-      await db.delete(
-          "devRestriction",
-          where: "restrictionName = ?",
-          whereArgs: ["$userName:$devName"]
-      );
+      await db.update("devRestriction", dr.toMap());
     }
+  }
+
+  Future<void> deleteDevRestriction(String devRestrictionName) async{
+    await db.delete("devRestriction", where: "restrictionName = ?", whereArgs: [devRestrictionName]);
   }
 
   Future<List<DevRestriction>> getUserRestrictedDevs(String memberName) async{
@@ -820,9 +825,9 @@ class LocalDB {
         print("DELETANIS A divRestriction");
         await txn.delete('divRestriction');
       }
-      if (existingTables.contains('deviceRestriction')) {
-        print("DELETANIS A deviceRestriction");
-        await txn.delete('deviceRestriction');
+      if (existingTables.contains('devRestriction')) {
+        print("DELETANIS A devRestriction");
+        await txn.delete('devRestriction');
       }
       //  await txn.delete('openPolls');
       //   await txn.delete('closedPolls');

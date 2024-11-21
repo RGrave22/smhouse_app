@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smhouse_app/Data/DivRestriction.dart';
 import 'package:smhouse_app/RoomPage/RoomPage.dart';
 
 import 'DB/DB.dart';
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   late User user;
   List<Division> rooms = [];
   bool isLoading = true;
+  late List<DivRestriction> divRestrictions;
 
 
   @override
@@ -32,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     user = await db.getLoginUser();
 
     rooms = await db.getDivisions(user.casa);
-
+    divRestrictions = await db.getUserRestrictedDivs(user.username);
     setState(() {
       isLoading = false;
     });
@@ -408,29 +410,59 @@ IconData _getRoomIcon(String roomName) {
 
 
   Widget _buildRoomCard(BuildContext  context, String roomName, Future<String> devicesOnFuture) {
-    return Card(
-      elevation: 2,
-      child: FutureBuilder<String>(
-        future: devicesOnFuture,
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          String devicesOnText = snapshot.data ?? 'Loading...';
-          return ListTile(
-            leading: const CircleAvatar(
-              backgroundImage: AssetImage('assets/Logo_init.jpeg'),
-            ),
-            title: Text(getDivName(roomName)),
-            subtitle: Text("Devices on: $devicesOnText"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
+    bool isRestricted = false;
+    for(DivRestriction dr in divRestrictions){
+      if(roomName.split(":")[2] == dr.divName && user.username == dr.username){
+        isRestricted = true;
+      }
+    }
+    if(isRestricted){
+      return Card(
+        color: Colors.grey.withOpacity(0.0001),
+        elevation: 2,
+        child: FutureBuilder<String>(
+          future: devicesOnFuture,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            String devicesOnText = snapshot.data ?? 'Loading...';
+            return ListTile(
+              leading: const Icon(
+                  Icons.lock,
+                  color: Colors.teal,
+              ),
+              title: Text(getDivName(roomName)),
+              subtitle: Text("Devices on: $devicesOnText"),
+              trailing: const Icon(Icons.chevron_right),
 
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => RoomPage(divName: roomName)),
-              );
-            },
-          );
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
+    }else{
+      return Card(
+        elevation: 2,
+        child: FutureBuilder<String>(
+          future: devicesOnFuture,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            String devicesOnText = snapshot.data ?? 'Loading...';
+            return ListTile(
+              leading: const CircleAvatar(
+                backgroundImage: AssetImage('assets/Logo_init.jpeg'),
+              ),
+              title: Text(getDivName(roomName)),
+              subtitle: Text("Devices on: $devicesOnText"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => RoomPage(divName: roomName)),
+                );
+              },
+            );
+          },
+        ),
+      );
+    }
+
   }
 }

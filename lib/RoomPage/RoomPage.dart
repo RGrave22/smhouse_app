@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smhouse_app/AC/ACPage.dart';
+import 'package:smhouse_app/Data/DevRestriction.dart';
 import 'package:smhouse_app/Data/Division.dart';
 import 'package:smhouse_app/VirtualAssist/VirtualAssistPage.dart';
 import 'package:smhouse_app/main.dart';
 
 import '../DB/DB.dart';
 import '../Data/Device.dart';
+import '../Data/User.dart';
 import '../HomePage.dart';
 import '../Light/LightPage.dart';
 import '../Profile/ProfilePage.dart';
@@ -25,12 +27,12 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _roomNameController = TextEditingController();
   final LocalDB db = LocalDB('SmHouse');
-
+  late User user;
   bool isLoading = true;
 
   late Division div;
   List<Device> devices = [];
-
+  late List<DevRestriction> devRestrictions;
   @override
   void initState() {
     getInfo();
@@ -41,10 +43,11 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
     setState(() {
       isLoading = true;
     });
+    user = await db.getLoginUser();
     div = await db.getDivision(widget.divName);
 
     devices = await db.getDevicesOfDivision(widget.divName);
-
+    devRestrictions = await db.getUserRestrictedDevs(user.username);
     setState(() {
       isLoading = false;
     });
@@ -239,57 +242,83 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
         deviceIcon = Icons.devices;
         break;
     }
+    bool isRestricted = false;
+    for(DevRestriction dr in devRestrictions){
+      if(dev.devName == dr.deviceName && user.username == dr.username){
+        isRestricted = true;
+      }
+    }
+    if(isRestricted){
+      return Card(
+        color: Colors.grey.withOpacity(0.0001),
+        elevation: 2,
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: Colors.teal,
+            child: Icon(deviceIcon, color: Colors.white),
+          ),
+          title: Text(dev.devName),
+          trailing: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+               Icon(Icons.lock, color: Colors.teal),
+            ],
+          ),
+        ),
+      );
+    }else{
+      return Card(
+        elevation: 2,
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: Colors.teal,
+            child: Icon(deviceIcon, color: Colors.white),
+          ),
+          title: Text(dev.devName),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Switch(
+                value: isDeviceOn,
+                onChanged: onChanged,
+                activeColor: Colors.green,
+                inactiveThumbColor: Colors.grey,
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {
+            switch (dev.type) {
+              case 'light':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LightPage(lightName: dev.devName)),
+                );
+                break;
+              case 'ac':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AcPage(acName: dev.devName)),
+                );
+                break;
+              case 'virtualAssist':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          VirtualAssistPage(vaName: dev.devName)),
+                );
+                break;
+              default:
+                break;
+            }
+          },
+        ),
+      );
+    }
 
-    return Card(
-      elevation: 2,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.teal,
-          child: Icon(deviceIcon, color: Colors.white),
-        ),
-        title: Text(dev.devName),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Switch(
-              value: isDeviceOn,
-              onChanged: onChanged,
-              activeColor: Colors.green,
-              inactiveThumbColor: Colors.grey,
-            ),
-            const Icon(Icons.chevron_right),
-          ],
-        ),
-        onTap: () {
-          switch (dev.type) {
-            case 'light':
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => LightPage(lightName: dev.devName)),
-              );
-              break;
-            case 'ac':
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AcPage(acName: dev.devName)),
-              );
-              break;
-            case 'virtualAssist':
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        VirtualAssistPage(vaName: dev.devName)),
-              );
-              break;
-            default:
-              break;
-          }
-        },
-      ),
-    );
   }
 
   void _showAddRoomDialog() {

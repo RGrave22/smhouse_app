@@ -76,11 +76,6 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const Text(
-              "(grau de parentesco)",
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(height: 8),
             const CircleAvatar(
               radius: 50,
@@ -102,7 +97,7 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Email: ${memberMail}\nBirthday:(N/A)",
+                "Email: ${memberMail}",
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),

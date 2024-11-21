@@ -315,16 +315,29 @@ void _showAddRoomDialog() {
                               backgroundColor: Colors.teal,
                               child: Icon(Icons.person, color: Colors.white),
                             ),
-                            title: Text(member.username),
+                            title: Text(member.username == member.casa.split(":")[0] ? "${member.username} (House Admin)" : member.username),
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => FamilyMemberPage(familyMember: member)),
-                              );
-                            },
-                            //subtitle: Text(member.username == houseAdm ? 'House Administrator' : '',)
-                            //subtitle: Text(member['relation']!),
-                          ),
+                              if (user.username == user.casa.split(":")[0]) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      FamilyMemberPage(familyMember: member)),
+                                );
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return const AlertDialog(
+                                          title: const Text(
+                                            'You are not house admin',
+                                            textAlign: TextAlign.center,
+                                          )
+                                      );
+                                    });
+                              }
+                              //subtitle: Text(member.username == houseAdm ? 'House Administrator' : '',)
+                              //subtitle: Text(member['relation']!),
+                            }),
                         );
                       },
                     ),
