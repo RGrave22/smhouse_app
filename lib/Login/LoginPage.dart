@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final LocalDB db = LocalDB('SmHouse');
 
-  late TextEditingController usernameController;
+  late TextEditingController emailController;
   late TextEditingController passwordController;
 
   bool _obscureText = true;
@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     initDatabase();
-    usernameController = TextEditingController();
+    emailController = TextEditingController();
     passwordController = TextEditingController();
     super.initState();
   }
@@ -38,13 +38,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> handleLogin() async {
-    String username = usernameController.text;
+    String email = emailController.text;
     String password = passwordController.text;
 
-    bool loginSuccess = await db.login(username, password);
+    bool loginSuccess = await db.login(email, password);
 
     if (loginSuccess) {
-      //_showAlertDialog('Login Successful', 'Welcome, $username!');
+      //_showAlertDialog('Login Successful', 'Welcome, $email!');
 
       Navigator.pushReplacement(
         context,
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
-      _showAlertDialog('Login Failed', 'Incorrect username or password.');
+      _showAlertDialog('Login Failed', 'Incorrect email or password.');
     }
   }
 
@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.fromLTRB(20, 25, 20, 0),
           child: TextField(
             cursorColor: const Color(0xFF153043), // Set the cursor color here
-            controller: usernameController,
+            controller: emailController,
             decoration:  const InputDecoration(
               border: UnderlineInputBorder(),
               labelText: 'Email',
@@ -143,8 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
             foregroundColor: WidgetStateProperty.all<Color>(Color(0xFF153043)
             ),
           ),
-          child:  const Text('Forgot Password?',
-          ),
+          child:  const Text('Forgot Password?'),
 
         ),
         Container(
