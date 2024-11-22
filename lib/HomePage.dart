@@ -162,7 +162,7 @@ class _HomePageState extends State<HomePage> {
         return Icons.kitchen;
       case "bedroom":
         return Icons.bed;
-      case "Quarto do Jojo":
+      case "quarto do jojo":
         return Icons.bed;
       case "garage":
         return Icons.garage;
