@@ -475,6 +475,19 @@ class LocalDB {
     });
   }
 
+  Future<void> updateUserHouse(String userId) async {
+    final db = await initDB();
+
+    await db.transaction((txn) async {
+      await txn.rawUpdate(
+        'UPDATE users SET casa = ? WHERE username = ?',
+        ["", userId],
+      );
+    });
+  }
+
+
+
   Future<void> updateACAirDirection(String acName, int airDirection) async {
     final db = await initDB();
 
