@@ -91,7 +91,6 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
                                     const Icon(Icons.close, color: Colors.teal),
                                 onPressed: () {
                                   Navigator.of(context).pop();
-                                  Navigator.of(context).pop();
                                 },
                               ),
                             ],
@@ -132,12 +131,7 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    memberName,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
+
                   const SizedBox(height: 8),
                   Container(
                     height: 175,
@@ -152,6 +146,12 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  Text(
+                    memberName,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 8),
                   const Align(
                     alignment: Alignment.centerLeft,

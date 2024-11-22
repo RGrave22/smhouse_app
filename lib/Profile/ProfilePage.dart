@@ -350,7 +350,7 @@ void _showAddMemberDialog() {
                             title: Text(member.username == member.casa.split(":")[0] ? "${member.username} (House Admin)" : member.username),
                             onTap: () {
                               if (user.username == user.casa.split(":")[0]) {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(builder: (context) =>
                                       FamilyMemberPage(familyMember: member)),
