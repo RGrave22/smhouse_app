@@ -197,7 +197,12 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
                                 )
                               },
                           child: Text("${memberName}'s Permissions",
-                              style: const TextStyle(color: Colors.white))),
+                              style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),),
+                              
                     ),
                   ]),
                 ],
