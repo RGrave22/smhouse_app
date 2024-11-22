@@ -238,10 +238,6 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                   child:ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: const BorderSide(color: Colors.teal),
-                        ),
                         padding: const EdgeInsets.all(10),
                       ),
                       onPressed: _showChooseDevice,
@@ -304,9 +300,22 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
-              'Choose Prohibited Device',
-            textAlign: TextAlign.center,
+          title:Row(
+            children: [
+              const Expanded(child: Text(
+                'Choose Prohibited Device',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.teal),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
           content: Container(
             width: double.maxFinite,
@@ -336,14 +345,6 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
 
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-        ],
 
         );
       },
@@ -471,9 +472,22 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState){
               return AlertDialog(
-                title: const Text(
-                  'Set Prohibition Time',
-                  textAlign: TextAlign.center,
+                title: Row(
+                  children: [
+                    const Expanded(child: Text(
+                      'Set Prohibition Time',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.teal),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
                 ),
 
                 content: SingleChildScrollView(
@@ -509,7 +523,8 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                                     setState(()=>
                                       isAllDay = value
                                     )
-                                  }
+                                  },
+                                  activeColor: Colors.green,
                               )
                             ]
                         ),
@@ -726,19 +741,9 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
                 ),
                 actions: [
                   restrictionDeleteButton(restrictedDev, !isNew, context),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Cancel'),
-                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.teal,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        side: const BorderSide(color: Colors.teal),
-                      ),
                       padding: const EdgeInsets.all(15),
                     ),
                     onPressed: () {
@@ -762,10 +767,6 @@ class _FamilyMemberPermissions extends State<FamilyMemberPermissions> {
       return ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            side: const BorderSide(color: Colors.red),
-          ),
           padding: const EdgeInsets.all(15),
         ),
         onPressed: () {
