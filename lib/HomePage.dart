@@ -162,6 +162,8 @@ class _HomePageState extends State<HomePage> {
         return Icons.kitchen;
       case "bedroom":
         return Icons.bed;
+      case "quatro do jojo":
+        return Icons.bed;
       case "garage":
         return Icons.garage;
       case "office":
@@ -170,6 +172,7 @@ class _HomePageState extends State<HomePage> {
         return Icons.tv_rounded;
       case "centro":
         return Icons.tv_rounded;
+
       default:
         return Icons.home;
     }
