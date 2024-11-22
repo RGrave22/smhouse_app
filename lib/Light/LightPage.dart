@@ -127,7 +127,23 @@ class _LightPageState extends State<LightPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Light Name'),
+          title: Row(
+            children: [
+              const Expanded(child: Text(
+                'Edit Light',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.teal),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -153,7 +169,7 @@ class _LightPageState extends State<LightPage> {
                   );
                 }).toList(),
                 decoration: const InputDecoration(
-                  labelText: 'Division',
+                  labelText: 'Change Division',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -165,32 +181,35 @@ class _LightPageState extends State<LightPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
               onPressed: () {
-
                 showDialog(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      title: const Text('Confirm Deletion'),
+                      title: Row(
+                        children: [
+                          const Expanded(child: Text(
+                            'Confirm Delete',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.teal),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
                       content: const Text('Are you sure you want to delete this light?'),
                       actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancel'),
-                        ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
                           ),
                           onPressed: () {
                             setState(() {
@@ -226,12 +245,6 @@ class _LightPageState extends State<LightPage> {
               child: const Text('Delete'),
             ),
             // Cancel button
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
             // Save button
             TextButton(
               onPressed: () {
@@ -264,7 +277,16 @@ class _LightPageState extends State<LightPage> {
                 });
                 Navigator.pop(context);
               },
-              child: const Text('Save'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+              ),
+              child: const Text(
+                'Save',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
           ],
         );

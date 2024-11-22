@@ -271,7 +271,6 @@ void _showAddMemberDialog() {
           )
         : Scaffold(
             appBar: AppBar(
-              title: Image.asset('assets/Logo_init.jpeg', height: 50),
               backgroundColor: Colors.white,
               elevation: 0,
               leading: IconButton(

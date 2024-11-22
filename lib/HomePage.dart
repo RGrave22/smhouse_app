@@ -468,7 +468,7 @@ IconData _getRoomIcon(String roomName) {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
 
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => RoomPage(divName: roomName)),
                 );

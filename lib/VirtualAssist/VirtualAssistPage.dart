@@ -141,7 +141,23 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit V.Assistant Name'),
+          title: Row(
+            children: [
+              const Expanded(child: Text(
+                'Edit V.Assistant',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.teal),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -167,7 +183,7 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
                   );
                 }).toList(),
                 decoration: const InputDecoration(
-                  labelText: 'Division',
+                  labelText: 'Change Division',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -179,9 +195,6 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
               onPressed: () {
                 // Show confirmation dialog before deletion
@@ -189,22 +202,30 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      title: const Text('Confirm Deletion'),
+                      title: Row(
+                        children: [
+                          const Expanded(child: Text(
+                            'Confirm Delete',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.teal),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
                       content: const Text('Are you sure you want to delete this virtual assistant?'),
                       actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancel'),
-                        ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
                           ),
                           onPressed: () {
                             setState(() {
@@ -239,13 +260,6 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
               },
               child: const Text('Delete'),
             ),
-            // Cancel button
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
             // Save button
             TextButton(
               onPressed: () {
@@ -272,7 +286,16 @@ class VirtualAssistPageState extends State<VirtualAssistPage> {
                 });
                 Navigator.pop(context);
               },
-              child: const Text('Save'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+              ),
+              child: const Text(
+                'Save',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
           ],
         );

@@ -49,7 +49,6 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
     )
         :Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/Logo_init.jpeg', height: 50),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -124,10 +123,7 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: const BorderSide(color: Colors.teal),
-                        ),
+
                         padding: const EdgeInsets.all(20),
                       ),
                       onPressed: () => {
@@ -135,7 +131,7 @@ class _FamilyMemberPage extends State<FamilyMemberPage> {
                         MaterialPageRoute(builder: (context) => FamilyMemberPermissions(familyMember: widget.familyMember)),
                       )},
                       child: Text(
-                          "${memberName}'s permissions",
+                          "${memberName}'s Permissions",
                           style: const TextStyle(color: Colors.white)
                       )
                   ),
